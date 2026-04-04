@@ -1,0 +1,23 @@
+# Enable or disable debug logging for troubleshooting.
+debug-mode: false
+
+# Enable or disable sound effects when players vanish.
+sound-enable: true
+
+# The sound effect played when vanishing. Change this to any valid sound.
+sound: 'AMBIENT_CAVE'
+
+# Configuration for various actions that are disabled when a player is vanished.
+disabled-actions:
+  damage: true
+  hunger: true
+  mob-target: true
+  silent-chest: true
+  silent-ender-chest: true
+  pressure-plates: true
+  death-messages: true
+  player-push: true
+  pickup-items: true
+
+# Defines the color used in plugin messages for enhanced readability or thematic consistency.
+plugin-color: 'BLUE'

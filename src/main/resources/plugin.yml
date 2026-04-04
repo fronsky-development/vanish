@@ -1,0 +1,90 @@
+name: '${plugin_name}'
+version: '${plugin_version}'
+main: '${plugin_main_class}'
+api-version: 1.20
+authors: [ 'Fronsky' ]
+website: 'https://fronsky.nl/projects/vanish'
+description: 'This is the official Fronsky Vanish plugin.'
+softdepend: [ 'ProtocolLib', 'Dynmap', 'PlaceholderAPI' ]
+
+commands:
+  vanish:
+    aliases: [ 'v' ]
+    permission: 'vanish.cmd.vanish'
+
+permissions:
+  vanish.*:
+    description: 'Full access to all Vanish features.'
+    default: op
+    children:
+      vanish.cmd.vanish: true
+      vanish.see: true
+      vanish.join: true
+
+  vanish.cmd.vanish:
+    description: 'Use /vanish command.'
+    default: op
+
+  vanish.cmd.vanish.others:
+    description: 'Toggle vanish for other players.'
+    default: op
+
+  vanish.cmd.vanish.gui:
+    description: 'Open vanish GUI.'
+    default: op
+
+  vanish.cmd.vanish.sound:
+    description: 'Configure vanish sound.'
+    default: op
+
+  vanish.cmd.vanish.silent:
+    description: 'Configure silent join.'
+    default: op
+
+  vanish.cmd.vanish.list:
+    description: 'List vanished players.'
+    default: op
+
+  vanish.cmd.vanish.join:
+    description: 'Send a fake join message.'
+    default: op
+
+  vanish.cmd.vanish.quit:
+    description: 'Send a fake quit message.'
+    default: op
+
+  vanish.cmd.vanish.tp:
+    description: 'Teleport to a player.'
+    default: op
+
+  vanish.cmd.vanish.color:
+    description: 'Change plugin color.'
+    default: op
+
+  vanish.cmd.vanish.info:
+    description: 'Show plugin info.'
+    default: true
+
+  vanish.cmd.vanish.help:
+    description: 'Show help.'
+    default: true
+
+  vanish.cmd.vanish.reload:
+    description: 'Reload the plugin configuration.'
+    default: op
+
+  vanish.cmd.vanish.permissions:
+    description: 'Show all Vanish permissions.'
+    default: true
+
+  vanish.cmd.vanish.placeholders:
+    description: 'Show PlaceholderAPI placeholders provided by Vanish.'
+    default: true
+
+  vanish.see:
+    description: 'See vanished players.'
+    default: op
+
+  vanish.join:
+    description: 'Auto-vanish on join.'
+    default: op
