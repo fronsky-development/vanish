@@ -6,8 +6,20 @@ No part of this software, including its source code, documentation, or compiled
 binaries, may be copied, modified, merged, published, distributed, sublicensed,
 sold, or otherwise used without prior written permission from the copyright holder.
 
-Unauthorized use, reproduction, or distribution of this software is strictly
-prohibited and may result in legal action.
+EXCEPTION: The public API provided by this software (the "VanishAPI" class and its
+public methods) may be freely called and integrated with by third-party plugins at
+runtime, provided that:
+
+  1. The Vanish plugin itself is not modified, redistributed, or bundled.
+  2. The Vanish plugin is obtained only through official distribution channels.
+  3. The third-party plugin does not expose, wrap, or re-publish the Vanish API
+     as its own.
+
+This exception permits the use of `compileOnly` or `provided` scope references
+to the Vanish jar solely for the purpose of compiling against the public API.
+
+Unauthorized use, reproduction, or distribution of this software beyond what is
+explicitly permitted above is strictly prohibited and may result in legal action.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
