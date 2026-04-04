@@ -49,7 +49,7 @@ All methods are **static** and can be called from anywhere without needing an in
 
 Add the Vanish jar as a `compileOnly` dependency. You can use a local file reference or a flat directory.
 
-**Option 1 — Local jar (flat directory):**
+**Option 1, local jar (flat directory):**
 
 ```groovy
 repositories {
@@ -63,7 +63,7 @@ dependencies {
 }
 ```
 
-**Option 2 — Direct file reference:**
+**Option 2, direct file reference:**
 
 ```groovy
 dependencies {
@@ -83,7 +83,7 @@ dependencies {
 </dependency>
 ```
 
-> **Important:** Use `compileOnly` (Gradle) or `provided` scope (Maven). Vanish should **not** be shaded or bundled into your plugin — it must already be installed on the server.
+> **Important:** Use `compileOnly` (Gradle) or `provided` scope (Maven). Vanish should **not** be shaded or bundled into your plugin. It must already be installed on the server.
 
 ---
 
@@ -99,8 +99,8 @@ softdepend: [ 'Vanish' ]
 ```
 
 Using `softdepend` ensures:
-- Your plugin loads **after** Vanish (if Vanish is present)
-- Your plugin still works **without** Vanish installed
+- Your plugin loads **after** Vanish (if Vanish is present).
+- Your plugin still works **without** Vanish installed.
 
 If your plugin **requires** Vanish to function, use `depend` instead:
 
@@ -146,18 +146,18 @@ boolean vanishInstalled = Bukkit.getPluginManager().getPlugin("Vanish") != null;
 
 All methods are `public static` and can be called directly on the class.
 
-| Method | Return Type | Description |
-|--------|-------------|-------------|
-| `isAvailable()` | `boolean` | Returns `true` if the Vanish plugin is loaded and ready |
-| `isVanished(Player player)` | `boolean` | Check if a player is currently vanished |
-| `isVanished(UUID uuid)` | `boolean` | Check if a player is vanished by UUID |
-| `vanishPlayer(Player player)` | `boolean` | Vanish a player. Returns `true` if successful |
-| `unvanishPlayer(Player player)` | `boolean` | Unvanish a player. Returns `true` if successful |
-| `toggleVanish(Player player)` | `boolean` | Toggle vanish. Returns `true` if now vanished |
-| `getVanishedPlayers()` | `Collection<VanishPlayer>` | Get all currently vanished players |
-| `getVanishedPlayerUUIDs()` | `Collection<UUID>` | Get UUIDs of all vanished players |
-| `getVanishedPlayerCount()` | `int` | Get the number of vanished players |
-| `canSeeVanished(Player player)` | `boolean` | Check if a player has permission to see vanished players |
+| Method                          | Return Type                | Description                                                |
+|---------------------------------|----------------------------|------------------------------------------------------------|
+| `isAvailable()`                 | `boolean`                  | Returns `true` if the Vanish plugin is loaded and ready    |
+| `isVanished(Player player)`     | `boolean`                  | Check if a player is currently vanished                    |
+| `isVanished(UUID uuid)`         | `boolean`                  | Check if a player is vanished by UUID                      |
+| `vanishPlayer(Player player)`   | `boolean`                  | Vanish a player, returns `true` if successful              |
+| `unvanishPlayer(Player player)` | `boolean`                  | Unvanish a player, returns `true` if successful            |
+| `toggleVanish(Player player)`   | `boolean`                  | Toggle vanish, returns `true` if now vanished              |
+| `getVanishedPlayers()`          | `Collection<VanishPlayer>` | Get all currently vanished players                         |
+| `getVanishedPlayerUUIDs()`      | `Collection<UUID>`         | Get UUIDs of all vanished players                          |
+| `getVanishedPlayerCount()`      | `int`                      | Get the number of vanished players                         |
+| `canSeeVanished(Player player)` | `boolean`                  | Check if a player has permission to see vanished players   |
 
 ---
 
@@ -281,7 +281,7 @@ public List<Player> getVisiblePlayers(Player viewer) {
 
 ## Full Integration Example
 
-Here's a complete example of a plugin that integrates with Vanish:
+Below is a complete example of a plugin that integrates with Vanish:
 
 ```java
 package com.example.myplugin;
@@ -346,7 +346,7 @@ public class MyPlugin extends JavaPlugin implements Listener {
             return true; // Target is not vanished
         }
 
-        // Target is vanished — only show to players with vanish.see
+        // Target is vanished, only show to players with vanish.see
         return VanishAPI.canSeeVanished(viewer);
     }
 }
@@ -372,7 +372,7 @@ Unless your plugin **requires** Vanish, use `softdepend` to make it optional. Th
 
 ### 3. Don't shade the Vanish jar
 
-Add Vanish as `compileOnly` / `provided` — it's a runtime dependency provided by the server's plugin folder.
+Add Vanish as `compileOnly` / `provided`. It is a runtime dependency provided by the server's plugin folder.
 
 ### 4. Handle null players
 
@@ -403,10 +403,10 @@ public void onEnable() {
 `VanishPlayer` objects may become stale when a player disconnects. Always get fresh references:
 
 ```java
-// ✅ Good — fresh check
+// ✅ Good, fresh check
 if (VanishAPI.isVanished(player)) { ... }
 
-// ❌ Bad — stale reference
+// ❌ Bad, stale reference
 VanishPlayer vp = ...; // stored earlier
 if (vp.getState() == State.HIDDEN) { ... } // may be outdated
 ```
@@ -425,7 +425,7 @@ if (vp.getState() == State.HIDDEN) { ... } // may be outdated
 
 ### Q: Can I cancel a vanish event?
 
-Not yet — cancellable events (`PreVanishEvent`, `PreUnvanishEvent`) are planned for a future release. Stay tuned!
+Not yet. Cancellable events (`PreVanishEvent`, `PreUnvanishEvent`) are planned for a future release.
 
 ### Q: Is the API thread-safe?
 
