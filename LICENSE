@@ -6,8 +6,10 @@ No part of this software, including its source code, documentation, or compiled
 binaries, may be copied, modified, merged, published, distributed, sublicensed,
 sold, or otherwise used without prior written permission from the copyright holder.
 
-EXCEPTION: The public API provided by this software (the "VanishAPI" class and its
-public methods) may be freely called and integrated with by third-party plugins at
+EXCEPTION — PUBLIC API USE:
+
+The public API provided by this software (the "VanishAPI" class and its public
+methods) may be freely called and integrated with by third-party plugins at
 runtime, provided that:
 
   1. The Vanish plugin itself is not modified, redistributed, or bundled.
@@ -17,6 +19,19 @@ runtime, provided that:
 
 This exception permits the use of `compileOnly` or `provided` scope references
 to the Vanish jar solely for the purpose of compiling against the public API.
+
+MACHINE LEARNING, ARTIFICIAL INTELLIGENCE, AND DATA MINING RESTRICTION:
+
+Use of this software, its source code, documentation, or any associated materials
+for the purpose of training, fine-tuning, or otherwise developing machine learning
+models, artificial intelligence systems, or any derivative datasets is strictly
+prohibited without prior written permission from the copyright holder.
+
+Automated scraping, crawling, indexing, or any form of data collection or mining
+of this repository, its source code, documentation, or associated materials is
+strictly prohibited unless explicitly authorized by the copyright holder. This
+restriction applies to, but is not limited to, web scrapers, bots, spiders,
+AI data collection agents, and similar automated tools.
 
 Unauthorized use, reproduction, or distribution of this software beyond what is
 explicitly permitted above is strictly prohibited and may result in legal action.
