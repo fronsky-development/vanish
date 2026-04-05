@@ -1,0 +1,52 @@
+Vanish
+Copyright © 2025-2026 Fronsky. All Rights Reserved.
+
+This product is proprietary software developed by Fronsky.
+Full license terms are available in the LICENSE file.
+
+THIRD-PARTY DEPENDENCIES
+
+This software includes or depends on the following third-party libraries and APIs
+at compile time. These are NOT bundled with the distributed plugin unless noted.
+
+  Spigot API
+    License: GNU General Public License v3.0
+    URL: https://hub.spigotmc.org/
+
+  Lombok
+    License: MIT License
+    URL: https://projectlombok.org/
+
+  Gson
+    License: Apache License 2.0
+    URL: https://github.com/google/gson
+    Note: Bundled at runtime via Minecraft server.
+
+  ProtocolLib (optional)
+    License: GNU General Public License v2.0
+    URL: https://github.com/dmulloy2/ProtocolLib
+
+  PlaceholderAPI (optional)
+    License: GNU General Public License v3.0
+    URL: https://github.com/PlaceholderAPI/PlaceholderAPI
+
+  Dynmap (optional)
+    License: Apache License 2.0
+    URL: https://github.com/webbukkit/dynmap
+
+TRADEMARKS
+
+Minecraft is a registered trademark of Mojang Studios / Microsoft Corporation.
+This project is not affiliated with or endorsed by Mojang Studios or Microsoft.
+
+AI, MACHINE LEARNING, AND DATA MINING
+
+Use of this software, its source code, documentation, or any associated materials
+for the purpose of training, fine-tuning, or otherwise developing machine learning
+models or artificial intelligence systems is strictly prohibited without prior
+written permission from the copyright holder.
+
+Automated scraping, crawling, indexing, or any form of data collection or mining
+of this repository or its contents is strictly prohibited unless explicitly
+authorized by the copyright holder.
+

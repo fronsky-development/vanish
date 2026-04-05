@@ -1,8 +1,6 @@
-# 📡 Vanish API Documentation
+# Vanish API Documentation
 
 > Developer guide for integrating with the Vanish plugin by Fronsky.
-
----
 
 ## Table of Contents
 
@@ -15,7 +13,7 @@
   - [VanishAPI](#vanishapi)
 - [Usage Examples](#usage-examples)
   - [Check if a Player is Vanished](#check-if-a-player-is-vanished)
-  - [Vanish / Unvanish a Player](#vanish--unvanish-a-player)
+  - [Vanish or Unvanish a Player](#vanish-or-unvanish-a-player)
   - [Toggle Vanish](#toggle-vanish)
   - [Get All Vanished Players](#get-all-vanished-players)
   - [Check if a Player Can See Vanished Players](#check-if-a-player-can-see-vanished-players)
@@ -24,22 +22,18 @@
 - [Best Practices](#best-practices)
 - [FAQ](#faq)
 
----
-
 ## Overview
 
 The **Vanish API** (`VanishAPI`) provides a simple, static API for third-party plugins to:
 
-- ✅ Check if a player is vanished
-- ✅ Programmatically vanish or unvanish players
-- ✅ Toggle vanish state
-- ✅ Get a list/count of all vanished players
-- ✅ Check if a player has permission to see vanished players
-- ✅ Verify that the Vanish plugin is loaded and available
+- Check if a player is vanished
+- Programmatically vanish or unvanish players
+- Toggle vanish state
+- Get a list or count of all vanished players
+- Check if a player has permission to see vanished players
+- Verify that the Vanish plugin is loaded and available
 
 All methods are **static** and can be called from anywhere without needing an instance.
-
----
 
 ## Getting Started
 
@@ -85,8 +79,6 @@ dependencies {
 
 > **Important:** Use `compileOnly` (Gradle) or `provided` scope (Maven). Vanish should **not** be shaded or bundled into your plugin. It must already be installed on the server.
 
----
-
 ### plugin.yml Setup
 
 Add `Vanish` as a **soft dependency** in your plugin's `plugin.yml`:
@@ -107,8 +99,6 @@ If your plugin **requires** Vanish to function, use `depend` instead:
 ```yaml
 depend: [ 'Vanish' ]
 ```
-
----
 
 ### Checking if Vanish is Available
 
@@ -136,8 +126,6 @@ Or check via Bukkit's plugin manager:
 boolean vanishInstalled = Bukkit.getPluginManager().getPlugin("Vanish") != null;
 ```
 
----
-
 ## API Reference
 
 ### VanishAPI
@@ -146,20 +134,18 @@ boolean vanishInstalled = Bukkit.getPluginManager().getPlugin("Vanish") != null;
 
 All methods are `public static` and can be called directly on the class.
 
-| Method                          | Return Type                | Description                                                |
-|---------------------------------|----------------------------|------------------------------------------------------------|
-| `isAvailable()`                 | `boolean`                  | Returns `true` if the Vanish plugin is loaded and ready    |
-| `isVanished(Player player)`     | `boolean`                  | Check if a player is currently vanished                    |
-| `isVanished(UUID uuid)`         | `boolean`                  | Check if a player is vanished by UUID                      |
-| `vanishPlayer(Player player)`   | `boolean`                  | Vanish a player, returns `true` if successful              |
-| `unvanishPlayer(Player player)` | `boolean`                  | Unvanish a player, returns `true` if successful            |
-| `toggleVanish(Player player)`   | `boolean`                  | Toggle vanish, returns `true` if now vanished              |
-| `getVanishedPlayers()`          | `Collection<VanishPlayer>` | Get all currently vanished players                         |
-| `getVanishedPlayerUUIDs()`      | `Collection<UUID>`         | Get UUIDs of all vanished players                          |
-| `getVanishedPlayerCount()`      | `int`                      | Get the number of vanished players                         |
-| `canSeeVanished(Player player)` | `boolean`                  | Check if a player has permission to see vanished players   |
-
----
+| Method                          | Return Type                | Description                                                 |
+|---------------------------------|----------------------------|-------------------------------------------------------------|
+| `isAvailable()`                 | `boolean`                  | Returns `true` if the Vanish plugin is loaded and ready     |
+| `isVanished(Player player)`     | `boolean`                  | Check if a player is currently vanished                     |
+| `isVanished(UUID uuid)`         | `boolean`                  | Check if a player is vanished by UUID                       |
+| `vanishPlayer(Player player)`   | `boolean`                  | Vanish a player, returns `true` if successful               |
+| `unvanishPlayer(Player player)` | `boolean`                  | Unvanish a player, returns `true` if successful             |
+| `toggleVanish(Player player)`   | `boolean`                  | Toggle vanish, returns `true` if now vanished               |
+| `getVanishedPlayers()`          | `Collection<VanishPlayer>` | Get all currently vanished players                          |
+| `getVanishedPlayerUUIDs()`      | `Collection<UUID>`         | Get UUIDs of all vanished players                           |
+| `getVanishedPlayerCount()`      | `int`                      | Get the number of vanished players                          |
+| `canSeeVanished(Player player)` | `boolean`                  | Check if a player has permission to see vanished players    |
 
 ## Usage Examples
 
@@ -177,7 +163,7 @@ public boolean isPlayerHidden(Player player) {
 }
 ```
 
-You can also check by UUID (useful when the `Player` object isn't available):
+You can also check by UUID (useful when the `Player` object is not available):
 
 ```java
 import java.util.UUID;
@@ -186,9 +172,7 @@ UUID playerUuid = UUID.fromString("...");
 boolean vanished = VanishAPI.isVanished(playerUuid);
 ```
 
----
-
-### Vanish / Unvanish a Player
+### Vanish or Unvanish a Player
 
 ```java
 Player player = ...; // your player reference
@@ -208,8 +192,6 @@ if (revealed) {
 
 > **Note:** `vanishPlayer()` returns `false` if the player is already vanished. `unvanishPlayer()` returns `false` if the player is not vanished.
 
----
-
 ### Toggle Vanish
 
 ```java
@@ -221,8 +203,6 @@ if (nowVanished) {
     player.sendMessage("You are now visible!");
 }
 ```
-
----
 
 ### Get All Vanished Players
 
@@ -244,8 +224,6 @@ int count = VanishAPI.getVanishedPlayerCount();
 getLogger().info("Currently vanished: " + count + " player(s)");
 ```
 
----
-
 ### Check if a Player Can See Vanished Players
 
 ```java
@@ -254,9 +232,7 @@ if (VanishAPI.canSeeVanished(player)) {
 }
 ```
 
-This checks for `vanish.see` or `vanish.*` permission.
-
----
+This checks for the `vanish.see` or `vanish.*` permission.
 
 ### Filter Vanished Players from Visibility
 
@@ -276,8 +252,6 @@ public List<Player> getVisiblePlayers(Player viewer) {
             .collect(Collectors.toList());
 }
 ```
-
----
 
 ## Full Integration Example
 
@@ -352,8 +326,6 @@ public class MyPlugin extends JavaPlugin implements Listener {
 }
 ```
 
----
-
 ## Best Practices
 
 ### 1. Always check `isAvailable()` first
@@ -370,13 +342,13 @@ if (VanishAPI.isAvailable()) {
 
 Unless your plugin **requires** Vanish, use `softdepend` to make it optional. This way your plugin works on servers without Vanish installed.
 
-### 3. Don't shade the Vanish jar
+### 3. Do not shade the Vanish jar
 
-Add Vanish as `compileOnly` / `provided`. It is a runtime dependency provided by the server's plugin folder.
+Add Vanish as `compileOnly` or `provided`. It is a runtime dependency provided by the server's plugin folder.
 
 ### 4. Handle null players
 
-The API methods handle `null` gracefully (returning `false` or empty collections), but it's still good practice to null-check:
+The API methods handle `null` gracefully (returning `false` or empty collections), but it is still good practice to null-check:
 
 ```java
 Player player = Bukkit.getPlayer("Steve");
@@ -398,20 +370,18 @@ public void onEnable() {
 }
 ```
 
-### 6. Don't store `VanishPlayer` references long-term
+### 6. Do not store `VanishPlayer` references long-term
 
 `VanishPlayer` objects may become stale when a player disconnects. Always get fresh references:
 
 ```java
-// ✅ Good, fresh check
+// Good: fresh check
 if (VanishAPI.isVanished(player)) { ... }
 
-// ❌ Bad, stale reference
+// Bad: stale reference
 VanishPlayer vp = ...; // stored earlier
 if (vp.getState() == State.HIDDEN) { ... } // may be outdated
 ```
-
----
 
 ## FAQ
 
@@ -439,9 +409,6 @@ The vanished player map uses `ConcurrentHashMap` (as of v3.0.1), so read operati
 
 Open an issue on [GitHub](https://github.com/fronsky-development/vanish/issues) with the `api` label.
 
----
-
 <p align="center">
   Made with ❤️ by <a href="https://fronsky.nl">Fronsky</a>
 </p>
-
