@@ -48,12 +48,12 @@ Add the Vanish jar as a `compileOnly` dependency. You can use a local file refer
 ```groovy
 repositories {
     flatDir {
-        dirs 'libs'  // Place Vanish-3.0.1.jar in a 'libs' folder
+        dirs 'libs'  // Place Vanish-<version>.jar in a 'libs' folder
     }
 }
 
 dependencies {
-    compileOnly files('libs/Vanish-3.0.1.jar')
+    compileOnly files('libs/Vanish-<version>.jar')
 }
 ```
 
@@ -61,7 +61,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    compileOnly files('/path/to/Vanish-3.0.1.jar')
+    compileOnly files('/path/to/Vanish-<version>.jar')
 }
 ```
 
@@ -71,9 +71,9 @@ dependencies {
 <dependency>
     <groupId>nl.fronsky</groupId>
     <artifactId>vanish</artifactId>
-    <version>3.0.1</version>
+    <version><!-- latest version --></version>
     <scope>provided</scope>
-    <systemPath>${project.basedir}/libs/Vanish-3.0.1.jar</systemPath>
+    <systemPath>${project.basedir}/libs/Vanish-<version>.jar</systemPath>
 </dependency>
 ```
 
@@ -399,7 +399,7 @@ Not yet. Cancellable events (`PreVanishEvent`, `PreUnvanishEvent`) are planned f
 
 ### Q: Is the API thread-safe?
 
-The vanished player map uses `ConcurrentHashMap` (as of v3.0.1), so read operations like `isVanished()` and `getVanishedPlayerCount()` are thread-safe. However, **mutating** operations (`vanishPlayer`, `unvanishPlayer`, `toggleVanish`) should always be called from the **main server thread**.
+The vanished player map uses `ConcurrentHashMap`, so read operations like `isVanished()` and `getVanishedPlayerCount()` are thread-safe. However, **mutating** operations (`vanishPlayer`, `unvanishPlayer`, `toggleVanish`) should always be called from the **main server thread**.
 
 ### Q: What happens if I call the API before Vanish is enabled?
 

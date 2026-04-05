@@ -113,7 +113,7 @@ cd vanish
 The output `.jar` file will be at:
 
 ```
-build/libs/Vanish-3.0.1.jar
+build/libs/Vanish-<version>.jar
 ```
 
 > **Note:** Each build generates a `vanish-build.properties` resource embedded in the jar. The `/vanish info` command reads this to display a build ID that is unique per build and stable at runtime.
