@@ -11,7 +11,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class List {
-    public List(CommandSender sender, Data data) {
+
+    private List() {
+    }
+
+    public static void execute(CommandSender sender, Data data) {
         int amountVanished = MetaData.getVanishedPlayersAmount(data);
         if (amountVanished == 0) {
             sender.sendMessage(ChatColor.WHITE + "There are " + amountVanished + " of " + MetaData.getOnlinePlayers().size() + " players in vanish.");

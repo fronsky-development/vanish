@@ -11,13 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MetaData {
-    private static final Map<UUID, Long> playerStateCache = new ConcurrentHashMap<>();
-    private static final long CACHE_DURATION_MS = 100; // 100ms cache
 
     /**
      * Retrieves a collection of VanishPlayer objects for all online players.
@@ -58,25 +54,22 @@ public class MetaData {
             return State.HIDDEN;
         }
 
-        player.removeMetadata("fronsky_vanish", data.getPlugin());
         return State.VISIBLE;
     }
 
     /**
-     * Clears the player state cache.
+     * Clears the player state cache. (No-op, kept for API compatibility.)
      */
     public static void clearCache() {
-        playerStateCache.clear();
+        // No-op: dead cache removed in R-13
     }
 
     /**
-     * Invalidates cache for a specific player.
+     * Invalidates cache for a specific player. (No-op, kept for API compatibility.)
      *
      * @param uuid the UUID of the player to invalidate
      */
     public static void invalidateCache(UUID uuid) {
-        if (uuid != null) {
-            playerStateCache.remove(uuid);
-        }
+        // No-op: dead cache removed in R-13
     }
 }

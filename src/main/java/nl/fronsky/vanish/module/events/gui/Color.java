@@ -18,7 +18,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class Color implements Listener {
-    private final String KEY = "fronsky_vanish_color_selection";
+    private static final String KEY = "fronsky_vanish_color_selection";
     private final Data data;
 
     public Color() {
@@ -31,22 +31,24 @@ public class Color implements Listener {
         if (!player.hasMetadata(KEY)) {
             return;
         }
-        try {
-            if (event.getCurrentItem().getType().equals(Material.AIR)) {
-                return;
-            }
-        } catch (NullPointerException exception) {
+        ItemStack current = event.getCurrentItem();
+        if (current == null || current.getType().equals(Material.AIR)) {
             return;
         }
 
         event.setCancelled(true);
         event.setResult(Event.Result.DENY);
-        if (event.getCurrentItem() != null && event.getCurrentItem().getType().name().substring(event.getCurrentItem().getType().name().indexOf("_")).equals("_STAINED_GLASS_PANE") && event.getCurrentItem().hasItemMeta()) {
-            ItemStack item = event.getCurrentItem();
-            if (item == null) return;
 
-            handleColorSelection(player, item);
+        String typeName = current.getType().name();
+        int underscoreIndex = typeName.indexOf("_");
+        if (underscoreIndex < 0 || !typeName.substring(underscoreIndex).equals("_STAINED_GLASS_PANE")) {
+            return;
         }
+        if (!current.hasItemMeta()) {
+            return;
+        }
+
+        handleColorSelection(player, current);
     }
 
     @EventHandler
@@ -69,7 +71,12 @@ public class Color implements Listener {
             return;
         }
 
-        BarColor color = BarColor.valueOf(name.substring(0, name.indexOf("_")));
+        BarColor color;
+        try {
+            color = BarColor.valueOf(name.substring(0, name.indexOf("_")));
+        } catch (IllegalArgumentException ignored) {
+            return;
+        }
         executeColorCommand(player, color);
         player.removeMetadata(KEY, data.getPlugin());
         player.closeInventory();

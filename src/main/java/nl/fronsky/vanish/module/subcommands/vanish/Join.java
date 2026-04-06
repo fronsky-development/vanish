@@ -11,14 +11,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Join {
-    public Join(CommandSender sender) {
+
+    private Join() {
+    }
+
+    public static void execute(CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessageWithColor());
+            Logger.warning(Language.NO_PLAYER.getMessage());
             return;
         }
 
         String message = Language.FAKE_JOIN.getMessageWithColor();
         message = message.replace("{player}", player.getDisplayName());
-        Bukkit.broadcastMessage(message);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            online.sendMessage(message);
+        }
     }
 }

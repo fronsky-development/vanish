@@ -4,40 +4,35 @@
 
 package nl.fronsky.vanish.logic.utils;
 
+import nl.fronsky.vanish.logic.logging.Logger;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 
 public class ColorUtil {
-    /**
-     * Converts RGB values to a Color object.
-     *
-     * @param r the red component of the color (0-255)
-     * @param g the green component of the color (0-255)
-     * @param b the blue component of the color (0-255)
-     * @return a Color object representing the specified RGB values
-     */
-    public static Color rgbToColor(int r, int g, int b) {
-        return Color.fromRGB(r, g, b);
+
+    private ColorUtil() {
     }
 
     /**
-     * Converts a Color object to RGB values.
+     * Parses a plugin color key (from config) into a {@link ChatColor}.
+     * Handles BarColor-to-ChatColor mapping for PINK and PURPLE.
      *
-     * @param color the Color object to convert to RGB values
-     * @return an array containing the red, green, and blue components of the color, respectively
+     * @param colorKey the color key from config (e.g. "BLUE", "PINK", "PURPLE")
+     * @return the corresponding ChatColor, or {@code ChatColor.BLUE} as default
      */
-    public static int[] colorToRGB(Color color) {
-        return new int[]{color.getRed(), color.getGreen(), color.getBlue()};
-    }
-
-    /**
-     * Converts a Color object to a hexadecimal representation.
-     *
-     * @param color the Color object to convert to hexadecimal
-     * @return a string representing the color in hexadecimal format
-     */
-    public static String colorToHex(Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    public static ChatColor parsePluginColor(String colorKey) {
+        if (colorKey == null || colorKey.isEmpty()) {
+            return ChatColor.BLUE;
+        }
+        try {
+            return switch (colorKey.toUpperCase()) {
+                case "PINK" -> ChatColor.LIGHT_PURPLE;
+                case "PURPLE" -> ChatColor.DARK_PURPLE;
+                default -> ChatColor.valueOf(colorKey.toUpperCase());
+            };
+        } catch (IllegalArgumentException e) {
+            Logger.warning("Invalid plugin color '" + colorKey + "', using BLUE as default.");
+            return ChatColor.BLUE;
+        }
     }
 
     /**

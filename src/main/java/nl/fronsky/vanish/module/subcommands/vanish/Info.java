@@ -16,7 +16,11 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Info {
-    public Info(CommandSender sender, ChatColor color) {
+
+    private Info() {
+    }
+
+    public static void execute(CommandSender sender, ChatColor color) {
         Main plugin = Main.getInstance();
         String version = plugin != null ? plugin.getDescription().getVersion() : "unknown";
         String buildId = "unknown";
@@ -52,7 +56,6 @@ public class Info {
             sender.sendMessage(ColorUtil.colorize("&7Website: &f" + url));
         }
 
-        // Footer aligned with header length
         String plain = ChatColor.stripColor(header);
         int len = plain.length();
         if (len <= 1) {

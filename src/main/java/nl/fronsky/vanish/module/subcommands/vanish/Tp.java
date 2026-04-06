@@ -12,9 +12,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Tp {
-    public Tp(CommandSender sender, String[] args) {
+
+    private Tp() {
+    }
+
+    public static void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessageWithColor());
+            Logger.warning(Language.NO_PLAYER.getMessage());
             return;
         }
         if (args.length == 0) {

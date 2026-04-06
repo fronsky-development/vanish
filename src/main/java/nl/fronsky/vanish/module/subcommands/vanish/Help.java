@@ -12,7 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Help {
-    public Help(CommandSender sender, ChatColor color, int page) {
+
+    private Help() {
+    }
+
+    public static void execute(CommandSender sender, ChatColor color, int page) {
         List<String> lines = new ArrayList<>();
 
         lines.add("&7- &f/vanish &8» &7Toggle vanish");

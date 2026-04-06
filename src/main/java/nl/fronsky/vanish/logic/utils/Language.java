@@ -42,15 +42,6 @@ public enum Language {
     }
 
     /**
-     * Retrieves the numerical ID of this enum constant.
-     *
-     * @return the numerical ID of this enum constant
-     */
-    public int getId() {
-        return ordinal();
-    }
-
-    /**
      * Retrieves the message associated with this enum constant.
      *
      * @return the message associated with this enum constant
@@ -61,11 +52,11 @@ public enum Language {
                     || VanishModule.getData().getMessages().get() == null) {
                 return message;
             }
-            String _message = VanishModule.getData().getMessages().get().getString(name().toLowerCase());
-            if (_message == null) {
-                _message = message;
+            String configMessage = VanishModule.getData().getMessages().get().getString(name().toLowerCase());
+            if (configMessage == null) {
+                configMessage = message;
             }
-            return _message;
+            return configMessage;
         } catch (Exception e) {
             return message;
         }
@@ -87,7 +78,7 @@ public enum Language {
      * @return the Language enum constant corresponding to the specified name,
      * or Language.DEFAULT if no matching enum constant is found
      */
-    public Language getLanguage(String name) {
+    public static Language getLanguage(String name) {
         Language language = null;
         for (Language obj : Language.values()) {
             if (obj.name().equalsIgnoreCase(name)) {

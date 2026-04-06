@@ -5,9 +5,9 @@
 package nl.fronsky.vanish.logic.utils;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -133,7 +133,7 @@ public final class ChatPaginator {
             String cmd = baseCommand + " " + (page - 1);
             prev.setColor(net.md_5.bungee.api.ChatColor.GRAY);
             prev.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                    new ComponentBuilder(ChatColor.WHITE + "Go to page " + (page - 1)).create()));
+                    new Text(ChatColor.WHITE + "Go to page " + (page - 1))));
             prev.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd));
             footer.addExtra(prev);
         }
@@ -147,7 +147,7 @@ public final class ChatPaginator {
             String cmd = baseCommand + " " + (page + 1);
             next.setColor(net.md_5.bungee.api.ChatColor.GRAY);
             next.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                    new ComponentBuilder(ChatColor.WHITE + "Go to page " + (page + 1)).create()));
+                    new Text(ChatColor.WHITE + "Go to page " + (page + 1))));
             next.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd));
             footer.addExtra(next);
         }

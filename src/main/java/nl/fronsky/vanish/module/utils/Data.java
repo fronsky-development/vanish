@@ -9,6 +9,7 @@ import nl.fronsky.vanish.Main;
 import nl.fronsky.vanish.logic.file.YmlFile;
 import nl.fronsky.vanish.logic.file.interfaces.IFile;
 import nl.fronsky.vanish.logic.logging.Logger;
+import nl.fronsky.vanish.logic.utils.ColorUtil;
 import nl.fronsky.vanish.module.events.DisabledActions;
 import nl.fronsky.vanish.module.models.VanishPlayer;
 import org.bukkit.Bukkit;
@@ -160,6 +161,42 @@ public class Data {
      */
     public void updateBarColor() {
         vanishedBossBar.setColor(getBarColor(config.get().getString("plugin-color")));
+    }
+
+    /**
+     * Returns whether the vanish sound effect is enabled.
+     *
+     * @return {@code true} if the sound is enabled
+     */
+    public boolean isSoundEnabled() {
+        return config.get().getBoolean("sound-enable");
+    }
+
+    /**
+     * Returns the configured vanish sound effect.
+     *
+     * @return the configured {@link org.bukkit.Sound}, or {@code AMBIENT_CAVE} as fallback
+     */
+    public org.bukkit.Sound getSound() {
+        String soundName = config.get().getString("sound");
+        if (soundName != null) {
+            try {
+                return org.bukkit.Sound.valueOf(soundName);
+            } catch (IllegalArgumentException e) {
+                Logger.warning("Invalid sound '" + soundName + "', using AMBIENT_CAVE as default.");
+            }
+        }
+        return org.bukkit.Sound.AMBIENT_CAVE;
+    }
+
+    /**
+     * Returns the configured plugin accent color as a {@link org.bukkit.ChatColor}.
+     * Handles PINK→LIGHT_PURPLE and PURPLE→DARK_PURPLE mapping.
+     *
+     * @return the configured chat color, or {@code BLUE} as fallback
+     */
+    public org.bukkit.ChatColor getPluginChatColor() {
+        return ColorUtil.parsePluginColor(config.get().getString("plugin-color"));
     }
 
     /**

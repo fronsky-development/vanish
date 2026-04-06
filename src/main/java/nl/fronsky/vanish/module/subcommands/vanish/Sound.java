@@ -18,31 +18,45 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 public class Sound {
-    public Sound(String[] args, CommandSender sender, Data data, ChatColor color) {
+
+    private Sound() {
+    }
+
+    public static void execute(String[] args, CommandSender sender, Data data, ChatColor color) {
         if (args.length > 0) {
-            soundState(sender, args, data);
+            handleSoundToggle(sender, args, data);
             return;
         }
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessageWithColor());
+            Logger.warning(Language.NO_PLAYER.getMessage());
             return;
         }
 
-        // Open the modern Sound GUI (handled by the Sound listener)
-        // We just open page 1 using the same title format the listener expects.
         int pageNum = 1;
-        Inventory inv = Bukkit.createInventory(player, 54,
-                color + "Select Sound " + ChatColor.DARK_GRAY + "(" + ChatColor.GRAY + pageNum + "/" + (int) Math.ceil(org.bukkit.Sound.values().length / 45.0) + ChatColor.DARK_GRAY + ")");
-        // Let the listener rebuild the right contents by calling its internal code path:
-        // easiest is to open the inventory that the listener creates; since it's private there,
-        // we instead mirror its layout here.
+        Inventory inv = createSoundInventory(player, pageNum, data, color);
+        player.openInventory(inv);
+        player.setMetadata("fronsky_vanish_sound_inventory", new FixedMetadataValue(data.getPlugin(), true));
+    }
 
-        // Build page 1 with the same layout as the listener
+    /**
+     * Creates a paginated sound selection inventory.
+     */
+    public static Inventory createSoundInventory(Player player, int pageNum, Data data, ChatColor color) {
+        int maxItemsPerPage = 45;
         org.bukkit.Sound[] sounds = org.bukkit.Sound.values();
+        int startIndex = (pageNum - 1) * maxItemsPerPage;
+        int endIndex = Math.min(startIndex + maxItemsPerPage, sounds.length);
+        int totalPages = Math.max(1, (int) Math.ceil(sounds.length / (double) maxItemsPerPage));
+
         String currentSound = data.getConfig().get().getString("sound", "AMBIENT_CAVE");
-        int startIndex = 0;
-        int endIndex = Math.min(45, sounds.length);
+
+        Inventory inventory = Bukkit.createInventory(player, 54,
+                color + "Select Sound " + ChatColor.DARK_GRAY + "(" + ChatColor.GRAY + pageNum + "/" + totalPages + ChatColor.DARK_GRAY + ")");
+
         int itemIndex = 0;
         for (int i = startIndex; i < endIndex; i++) {
             org.bukkit.Sound s = sounds[i];
@@ -60,59 +74,58 @@ public class Sound {
             lore.add(ChatColor.GRAY + "Right click: " + ChatColor.WHITE + "Select");
             meta.setLore(lore);
             item.setItemMeta(meta);
-            inv.setItem(itemIndex++, item);
+            inventory.setItem(itemIndex++, item);
         }
 
-        // nav
-        if (pageNum < Math.ceil(sounds.length / 45.0)) {
+        if (pageNum < totalPages) {
             ItemStack next = new ItemStack(Material.ARROW);
             ItemMeta meta = next.getItemMeta();
             if (meta != null) {
                 meta.setDisplayName(ChatColor.GREEN + "Next Page");
-                meta.setLore(java.util.Collections.singletonList(ChatColor.GRAY + "Go to page " + (pageNum + 1)));
+                meta.setLore(Collections.singletonList(ChatColor.GRAY + "Go to page " + (pageNum + 1)));
                 next.setItemMeta(meta);
             }
-            inv.setItem(53, next);
+            inventory.setItem(53, next);
+        }
+        if (pageNum > 1) {
+            ItemStack prev = new ItemStack(Material.ARROW);
+            ItemMeta meta = prev.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(ChatColor.GREEN + "Previous Page");
+                meta.setLore(Collections.singletonList(ChatColor.GRAY + "Go to page " + (pageNum - 1)));
+                prev.setItemMeta(meta);
+            }
+            inventory.setItem(45, prev);
         }
 
         ItemStack hint = new ItemStack(Material.PAPER);
         ItemMeta hintMeta = hint.getItemMeta();
         if (hintMeta != null) {
             hintMeta.setDisplayName(ChatColor.YELLOW + "How it works");
-            hintMeta.setLore(java.util.Arrays.asList(
+            hintMeta.setLore(Arrays.asList(
                     ChatColor.GRAY + "Pick the sound used when vanishing.",
                     ChatColor.DARK_GRAY + "Preview = play sound once.",
                     ChatColor.DARK_GRAY + "Select = save to config."
             ));
             hint.setItemMeta(hintMeta);
         }
-        inv.setItem(49, hint);
+        inventory.setItem(49, hint);
 
-        player.openInventory(inv);
-        player.setMetadata("fronsky_vanish_sound_inventory", new FixedMetadataValue(data.getPlugin(), true));
+        return inventory;
     }
 
-    /**
-     * Toggles the vanish sound state based on the provided arguments and updates the configuration.
-     *
-     * @param sender the command sender who issued the sound state change
-     * @param args   the arguments provided by the command sender (expected to be "on"/"true" or "off"/"false")
-     * @param data   the data object containing the configuration and message utilities
-     */
-    private void soundState(CommandSender sender, String[] args, Data data) {
+    private static void handleSoundToggle(CommandSender sender, String[] args, Data data) {
         String message;
         boolean soundEnabled;
         if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("true")) {
             soundEnabled = true;
             message = Language.VANISH_SOUND_ENABLED.getMessageWithColor();
-        } else {
-            if (!args[0].equalsIgnoreCase("off") && !args[0].equalsIgnoreCase("false")) {
-                sender.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
-                return;
-            }
-
+        } else if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("false")) {
             soundEnabled = false;
             message = Language.VANISH_SOUND_DISABLED.getMessageWithColor();
+        } else {
+            sender.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
+            return;
         }
 
         data.getConfig().get().set("sound-enable", soundEnabled);
