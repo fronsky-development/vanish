@@ -17,7 +17,7 @@ public class Quit {
 
     public static void execute(CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessage());
+            Logger.info(Language.NO_PLAYER.getPlainMessage());
             return;
         }
 

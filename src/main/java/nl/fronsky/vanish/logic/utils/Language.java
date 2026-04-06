@@ -62,8 +62,9 @@ public enum Language {
 
     /**
      * Retrieves the message associated with this enum constant.
+     * Note: may contain raw {@code &} color codes from config.
      *
-     * @return the message associated with this enum constant
+     * @return the raw message associated with this enum constant
      */
     public String getMessage() {
         try {
@@ -79,6 +80,18 @@ public enum Language {
         } catch (Exception e) {
             return message;
         }
+    }
+
+    /**
+     * Retrieves the message with all color codes stripped.
+     * Suitable for console/Logger output.
+     *
+     * @return the plain text message without any color codes
+     */
+    public String getPlainMessage() {
+        String raw = getMessage();
+        // Strip &x codes and §x codes
+        return ColorUtil.decolorize(ColorUtil.colorize(raw));
     }
 
     /**

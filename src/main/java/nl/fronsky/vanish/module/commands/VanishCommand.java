@@ -46,7 +46,7 @@ public class VanishCommand extends CommandHandler {
             }
         }
         if (vanishPlayer == null) {
-            Logger.warning(Language.NO_PLAYER.getMessageWithColor());
+            Logger.info(Language.NO_PLAYER.getPlainMessage());
             return;
         }
         if (MetaData.getVanishState(vanishPlayer.getPlayer(), data).equals(State.HIDDEN)) {
@@ -68,9 +68,15 @@ public class VanishCommand extends CommandHandler {
     private void others(CommandSender sender, VanishPlayer target) {
         boolean isVanished = MetaData.getVanishState(target.getPlayer(), data).equals(State.HIDDEN);
         Language messageKey = isVanished ? Language.VISIBLE_SUCCESS : Language.VANISH_SUCCESS;
-        String message = messageKey.getMessageWithColor();
-        message = message.replace("{player}", target.getPlayer().getDisplayName());
-        sender.sendMessage(message);
+
+        if (sender instanceof Player) {
+            String message = messageKey.getMessageWithColor().replace("{player}", target.getPlayer().getDisplayName());
+            sender.sendMessage(message);
+        } else {
+            String message = messageKey.getPlainMessage().replace("{player}", target.getName());
+            Logger.info(message);
+        }
+
         if (isVanished) {
             target.show(false);
         } else {

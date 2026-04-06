@@ -86,7 +86,7 @@ public class VanishPlayer {
      */
     public void sendMessage(String message) {
         if (message.isEmpty()) {
-            Logger.severe(Language.MESSAGE_NOT_VALID.getMessage().replace("{player}", displayName));
+            Logger.severe(Language.MESSAGE_NOT_VALID.getPlainMessage().replace("{player}", displayName));
             return;
         }
         player.sendMessage(ColorUtil.colorize(message));

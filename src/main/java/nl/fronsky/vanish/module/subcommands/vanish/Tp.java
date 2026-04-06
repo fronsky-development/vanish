@@ -18,7 +18,7 @@ public class Tp {
 
     public static void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessage());
+            Logger.info(Language.NO_PLAYER.getPlainMessage());
             return;
         }
         if (args.length == 0) {

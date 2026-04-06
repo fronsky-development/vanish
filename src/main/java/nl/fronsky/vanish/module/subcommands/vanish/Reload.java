@@ -20,12 +20,10 @@ public class Reload {
         try {
             data.reloadConfigurations();
 
-            String message = Language.PLUGIN_RELOADED.getMessageWithColor();
-
             if (sender instanceof Player) {
-                sender.sendMessage(ColorUtil.colorize(message));
+                sender.sendMessage(ColorUtil.colorize(Language.PLUGIN_RELOADED.getMessageWithColor()));
             } else {
-                Logger.info(ColorUtil.colorize(message));
+                Logger.info(Language.PLUGIN_RELOADED.getPlainMessage());
             }
 
             Logger.info("Plugin reloaded by " + sender.getName());

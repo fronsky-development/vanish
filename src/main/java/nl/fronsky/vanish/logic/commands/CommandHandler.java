@@ -84,7 +84,11 @@ public abstract class CommandHandler implements TabCompleter, CommandExecutor, I
             onCommand(sender, label, args);
         } catch (Exception e) {
             Logger.exception("Error executing command: " + name, e);
-            sender.sendMessage("§cAn error occurred while executing this command. Please check the console.");
+            if (sender instanceof Player) {
+                sender.sendMessage("§cAn error occurred while executing this command. Please check the console.");
+            } else {
+                Logger.severe("An error occurred while executing command: " + name + ". Check console for details.");
+            }
         }
         return true;
     }

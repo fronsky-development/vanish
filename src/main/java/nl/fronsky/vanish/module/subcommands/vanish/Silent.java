@@ -18,7 +18,7 @@ public class Silent {
 
     public static void execute(String[] args, CommandSender sender, Data data) {
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessage());
+            Logger.info(Language.NO_PLAYER.getPlainMessage());
             return;
         }
 

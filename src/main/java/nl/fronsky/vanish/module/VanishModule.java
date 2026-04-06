@@ -42,7 +42,7 @@ public class VanishModule extends Module {
     @Override
     public void onEnable() {
         if (data.getProtocolLib() == null) {
-            Logger.warning(Language.PROTOCOLLIB_NOT_FOUND.getMessage());
+            Logger.warning(Language.PROTOCOLLIB_NOT_FOUND.getPlainMessage());
         } else {
             Logger.info("ProtocolLib integration enabled.");
         }

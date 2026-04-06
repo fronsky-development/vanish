@@ -32,7 +32,7 @@ public class Sound {
             return;
         }
         if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessage());
+            Logger.info(Language.NO_PLAYER.getPlainMessage());
             return;
         }
 
@@ -115,22 +115,31 @@ public class Sound {
     }
 
     private static void handleSoundToggle(CommandSender sender, String[] args, Data data) {
-        String message;
+        Language messageKey;
         boolean soundEnabled;
         if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("true")) {
             soundEnabled = true;
-            message = Language.VANISH_SOUND_ENABLED.getMessageWithColor();
+            messageKey = Language.VANISH_SOUND_ENABLED;
         } else if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("false")) {
             soundEnabled = false;
-            message = Language.VANISH_SOUND_DISABLED.getMessageWithColor();
+            messageKey = Language.VANISH_SOUND_DISABLED;
         } else {
-            sender.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
+            if (sender instanceof Player) {
+                sender.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
+            } else {
+                Logger.info(Language.WRONG_ARGS.getPlainMessage().replace("{arg}", "{on:off}"));
+            }
             return;
         }
 
         data.getConfig().get().set("sound-enable", soundEnabled);
         data.getConfig().save();
         data.getConfig().reload();
-        sender.sendMessage(ColorUtil.colorize(message));
+
+        if (sender instanceof Player) {
+            sender.sendMessage(ColorUtil.colorize(messageKey.getMessageWithColor()));
+        } else {
+            Logger.info(messageKey.getPlainMessage());
+        }
     }
 }
