@@ -7,7 +7,6 @@ def plugin_group = 'nl.fronsky'
 def plugin_version = '3.0.1'
 def spigot_version = '1.20'
 def java_version = 17
-def main_class = "${plugin_group}.${plugin_name.toLowerCase()}.Main"
 
 group = plugin_group
 version = plugin_version
@@ -17,10 +16,6 @@ repositories {
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url = 'https://repo.extendedclip.com/releases/' }
-
-    flatDir {
-        dirs 'libs'
-    }
 }
 
 dependencies {

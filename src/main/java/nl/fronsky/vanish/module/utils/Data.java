@@ -9,6 +9,7 @@ import nl.fronsky.vanish.Main;
 import nl.fronsky.vanish.logic.file.YmlFile;
 import nl.fronsky.vanish.logic.file.interfaces.IFile;
 import nl.fronsky.vanish.logic.logging.Logger;
+import nl.fronsky.vanish.module.events.DisabledActions;
 import nl.fronsky.vanish.module.models.VanishPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
@@ -17,11 +18,9 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import nl.fronsky.vanish.module.events.DisabledActions;
-
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class Data {
