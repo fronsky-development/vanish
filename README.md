@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-3.0.1-blue?style=for-the-badge" alt="Version">
-  <img src="https://img.shields.io/badge/Minecraft-1.20--1.21+-green?style=for-the-badge" alt="Minecraft">
+  <img src="https://img.shields.io/badge/Minecraft-1.20+-green?style=for-the-badge" alt="Minecraft">
   <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge" alt="Java">
   <img src="https://img.shields.io/badge/license-All%20Rights%20Reserved-red?style=for-the-badge" alt="License">
 </p>
