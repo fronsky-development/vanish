@@ -20,10 +20,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class VanishPlayer {
-    private final String KEY = "fronsky_vanish";
+    private static final String METADATA_KEY = "fronsky_vanish";
     private final Data data;
     @Getter
     private final Player player;
@@ -44,9 +45,9 @@ public class VanishPlayer {
         instantiatePlayerData();
         state = MetaData.getVanishState(player, data);
         if (state.equals(State.VISIBLE)) {
-            player.removeMetadata(KEY, data.getPlugin());
+            player.removeMetadata(METADATA_KEY, data.getPlugin());
         } else {
-            player.setMetadata(KEY, new FixedMetadataValue(data.getPlugin(), true));
+            player.setMetadata(METADATA_KEY, new FixedMetadataValue(data.getPlugin(), true));
         }
     }
 
@@ -59,9 +60,9 @@ public class VanishPlayer {
     public static Result<VanishPlayer> getPlayer(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) {
-            return Result.Fail(new Exception(Language.PLAYER_NOT_FOUND.getMessage()));
+            return Result.fail(new Exception(Language.PLAYER_NOT_FOUND.getMessage()));
         }
-        return Result.Ok(new VanishPlayer(player));
+        return Result.ok(new VanishPlayer(player));
     }
 
     /**
@@ -73,9 +74,9 @@ public class VanishPlayer {
     public static Result<VanishPlayer> getPlayer(String name) {
         Player player = Bukkit.getPlayer(name);
         if (player == null) {
-            return Result.Fail(new Exception(Language.PLAYER_NOT_FOUND.getMessage()));
+            return Result.fail(new Exception(Language.PLAYER_NOT_FOUND.getMessage()));
         }
-        return Result.Ok(new VanishPlayer(player));
+        return Result.ok(new VanishPlayer(player));
     }
 
     /**
@@ -85,7 +86,7 @@ public class VanishPlayer {
      */
     public void sendMessage(String message) {
         if (message.isEmpty()) {
-            Logger.severe(Language.MESSAGE_NOT_VALID.getMessage().replace("<player>", displayName));
+            Logger.severe(Language.MESSAGE_NOT_VALID.getPlainMessage().replace("{player}", displayName));
             return;
         }
         player.sendMessage(ColorUtil.colorize(message));
@@ -108,7 +109,7 @@ public class VanishPlayer {
      */
     public void hide(boolean join) {
         state = State.HIDDEN;
-        player.setMetadata(KEY, new FixedMetadataValue(data.getPlugin(), true));
+        player.setMetadata(METADATA_KEY, new FixedMetadataValue(data.getPlugin(), true));
         player.setCollidable(!data.getConfig().get().getBoolean("disabled-actions.player-push"));
         player.setCanPickupItems(!data.getConfig().get().getBoolean("disabled-actions.pickup-items"));
         data.getVanishedPlayers().put(uuid, this);
@@ -126,7 +127,7 @@ public class VanishPlayer {
      */
     public void show(boolean quit) {
         state = State.VISIBLE;
-        player.removeMetadata(KEY, data.getPlugin());
+        player.removeMetadata(METADATA_KEY, data.getPlugin());
         player.setCollidable(true);
         player.setCanPickupItems(true);
         data.getVanishedPlayers().remove(uuid);
@@ -141,7 +142,7 @@ public class VanishPlayer {
      * Initializes the player's data if it does not exist.
      */
     private void instantiatePlayerData() {
-        assert data != null;
+        Objects.requireNonNull(data, "Data must not be null when instantiating player data");
         if (!data.getPlayers().get().contains(uuid.toString()) && !data.getPlayers().get().contains(uuid + ".silent")) {
             data.getPlayers().get().set(uuid + ".silent", true);
             data.getPlayers().save();

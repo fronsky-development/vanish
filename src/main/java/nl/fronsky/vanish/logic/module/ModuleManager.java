@@ -41,8 +41,8 @@ public class ModuleManager {
         moduleStatus = Status.LOADING;
         for (Module module : modules.values()) {
             Result<String> result = module.load();
-            if (!result.Success()) {
-                throw result.Exception();
+            if (!result.success()) {
+                throw result.exception();
             }
         }
         moduleStatus = Status.LOADED;
@@ -62,8 +62,8 @@ public class ModuleManager {
         moduleStatus = Status.ENABLING;
         for (Module module : modules.values()) {
             Result<String> result = module.enable();
-            if (!result.Success()) {
-                throw result.Exception();
+            if (!result.success()) {
+                throw result.exception();
             }
         }
         moduleStatus = Status.ENABLED;
@@ -83,8 +83,8 @@ public class ModuleManager {
         moduleStatus = Status.DISABLING;
         for (Module module : modules.values()) {
             Result<String> result = module.disable();
-            if (!result.Success()) {
-                throw result.Exception();
+            if (!result.success()) {
+                throw result.exception();
             }
         }
         moduleStatus = Status.DISABLED;

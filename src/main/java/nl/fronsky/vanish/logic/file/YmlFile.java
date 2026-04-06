@@ -76,7 +76,6 @@ public class YmlFile implements IFile<FileConfiguration> {
             this.file = new File(plugin.getDataFolder(), fileName);
         }
 
-        this.configuration = YamlConfiguration.loadConfiguration(file);
 
         this.configuration = YamlConfiguration.loadConfiguration(this.file);
         final InputStream stream = this.plugin.getResource(this.fileName);

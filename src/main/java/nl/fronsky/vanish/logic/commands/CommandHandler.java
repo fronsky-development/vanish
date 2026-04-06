@@ -28,7 +28,6 @@ public abstract class CommandHandler implements TabCompleter, CommandExecutor, I
     @Getter
     private final List<String> subcommands;
     private final boolean isValid;
-    private Player player;
 
     protected CommandHandler() {
         subcommands = new ArrayList<>();
@@ -61,8 +60,7 @@ public abstract class CommandHandler implements TabCompleter, CommandExecutor, I
     public boolean onCommand(@NonNull CommandSender sender, @NonNull Command command, @NonNull String label, @NonNull String[] args) {
         if (!isValid) return true;
 
-        player = null;
-        if (sender instanceof Player) player = (Player) sender;
+        Player player = (sender instanceof Player) ? (Player) sender : null;
 
         if (!subcommands.isEmpty() && args != null && args.length > 0) {
             String subcommand = getSubcommand(args);
@@ -86,7 +84,11 @@ public abstract class CommandHandler implements TabCompleter, CommandExecutor, I
             onCommand(sender, label, args);
         } catch (Exception e) {
             Logger.exception("Error executing command: " + name, e);
-            sender.sendMessage("§cAn error occurred while executing this command. Please check the console.");
+            if (sender instanceof Player) {
+                sender.sendMessage("§cAn error occurred while executing this command. Please check the console.");
+            } else {
+                Logger.severe("An error occurred while executing command: " + name + ". Check console for details.");
+            }
         }
         return true;
     }
@@ -96,8 +98,7 @@ public abstract class CommandHandler implements TabCompleter, CommandExecutor, I
         if (!isValid) return new ArrayList<>();
 
         List<String> completions = new ArrayList<>();
-        player = null;
-        if (sender instanceof Player) player = (Player) sender;
+        Player player = (sender instanceof Player) ? (Player) sender : null;
 
         if (args.length == 1) {
             subcommands.stream()

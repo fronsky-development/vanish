@@ -12,17 +12,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Reload {
-    public Reload(Data data, CommandSender sender) {
+
+    private Reload() {
+    }
+
+    public static void execute(Data data, CommandSender sender) {
         try {
             data.reloadConfigurations();
 
-            String message = Language.PLUGIN_RELOADED.getMessageWithColor();
-
             if (sender instanceof Player) {
-                sender.sendMessage(ColorUtil.colorize(message));
+                sender.sendMessage(ColorUtil.colorize(Language.PLUGIN_RELOADED.getMessageWithColor()));
             } else {
-                // Console execution should go to log, not to CommandSender output as a chat-like message.
-                Logger.info(ColorUtil.colorize(message));
+                Logger.info(Language.PLUGIN_RELOADED.getPlainMessage());
             }
 
             Logger.info("Plugin reloaded by " + sender.getName());

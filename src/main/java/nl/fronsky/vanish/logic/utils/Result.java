@@ -4,14 +4,7 @@
 
 package nl.fronsky.vanish.logic.utils;
 
-public class Result<T> {
-    private final T value;
-    private final Exception exception;
-
-    public Result(T value, Exception exception) {
-        this.value = value;
-        this.exception = exception;
-    }
+public record Result<T>(T value, Exception exception) {
 
     /**
      * Creates a successful Result object with a result value.
@@ -20,8 +13,8 @@ public class Result<T> {
      * @param <T>    the type of the result value
      * @return a new Result object representing a successful operation with the specified result value
      */
-    public static <T> Result<T> Ok(T result) {
-        return new Result<T>(result, null);
+    public static <T> Result<T> ok(T result) {
+        return new Result<>(result, null);
     }
 
     /**
@@ -31,8 +24,8 @@ public class Result<T> {
      * @param <T>       the type of the result value (irrelevant in this case)
      * @return a new Result object representing a failed operation with the specified exception
      */
-    public static <T> Result<T> Fail(Exception exception) {
-        return new Result<T>(null, exception);
+    public static <T> Result<T> fail(Exception exception) {
+        return new Result<>(null, exception);
     }
 
     /**
@@ -40,7 +33,8 @@ public class Result<T> {
      *
      * @return the value associated with this object
      */
-    public T Value() {
+    @Override
+    public T value() {
         return value;
     }
 
@@ -49,7 +43,8 @@ public class Result<T> {
      *
      * @return the exception associated with this object
      */
-    public Exception Exception() {
+    @Override
+    public Exception exception() {
         return exception;
     }
 
@@ -58,7 +53,7 @@ public class Result<T> {
      *
      * @return {@code true} if the operation was successful; {@code false} otherwise
      */
-    public boolean Success() {
+    public boolean success() {
         return exception == null;
     }
 

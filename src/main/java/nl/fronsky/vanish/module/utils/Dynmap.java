@@ -4,7 +4,6 @@
 
 package nl.fronsky.vanish.module.utils;
 
-import nl.fronsky.vanish.module.models.VanishPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -21,15 +20,6 @@ public class Dynmap {
     }
 
     /**
-     * Hides all online players from Dynmap if installed.
-     */
-    public static void hideAll() {
-        for (VanishPlayer vanishPlayer : MetaData.getOnlinePlayers()) {
-            hide(vanishPlayer.getPlayer());
-        }
-    }
-
-    /**
      * Shows the player on Dynmap if installed.
      *
      * @param player the player to show on Dynmap
@@ -40,14 +30,6 @@ public class Dynmap {
         }
     }
 
-    /**
-     * Shows all online players on Dynmap if installed.
-     */
-    public static void showAll() {
-        for (VanishPlayer vanishPlayer : MetaData.getOnlinePlayers()) {
-            show(vanishPlayer.getPlayer());
-        }
-    }
 
     /**
      * Checks if Dynmap plugin is installed.

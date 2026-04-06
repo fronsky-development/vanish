@@ -10,15 +10,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Permissions {
-    public Permissions(CommandSender sender, ChatColor color, Data data, int page) {
-        // data reserved for future localization/config, keep parameter for API stability
 
-        List<String> lines = new ArrayList<>();
+    private Permissions() {
+    }
 
-        // Short lines to fit chat
+    public static void execute(CommandSender sender, ChatColor color, Data data, int page) {
+        java.util.List<String> lines = new ArrayList<>();
+
         lines.add("&7- &fvanish.cmd.vanish &8» &7Use /vanish");
         lines.add("&7- &fvanish.cmd.vanish.others &8» &7Vanish others");
         lines.add("&7- &fvanish.cmd.vanish.gui &8» &7Open GUI");

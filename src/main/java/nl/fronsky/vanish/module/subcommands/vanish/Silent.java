@@ -12,35 +12,32 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class Silent {
-    public Silent(String[] args, CommandSender sender, Data data) {
-        if (!(sender instanceof Player player)) {
-            Logger.warning(Language.NO_PLAYER.getMessage());
-            return;
-        }
 
-        if (args.length > 0) {
-            silentState(sender, args, data, player);
-            return;
-        }
-
-        player.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
+    private Silent() {
     }
 
+    public static void execute(String[] args, CommandSender sender, Data data) {
+        if (!(sender instanceof Player player)) {
+            Logger.info(Language.NO_PLAYER.getPlainMessage());
+            return;
+        }
 
-    private void silentState(CommandSender sender, String[] args, Data data, Player player) {
+        if (args.length == 0) {
+            player.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
+            return;
+        }
+
         String message;
         boolean silentEnabled;
         if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("true")) {
             silentEnabled = true;
             message = Language.VANISH_SILENT_ENABLED.getMessageWithColor();
-        } else {
-            if (!args[0].equalsIgnoreCase("off") && !args[0].equalsIgnoreCase("false")) {
-                sender.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
-                return;
-            }
-
+        } else if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("false")) {
             silentEnabled = false;
             message = Language.VANISH_SILENT_DISABLED.getMessageWithColor();
+        } else {
+            sender.sendMessage(Language.WRONG_ARGS.getMessageWithColor().replace("{arg}", "{on:off}"));
+            return;
         }
 
         data.getPlayers().get().set(player.getUniqueId() + ".silent", silentEnabled);

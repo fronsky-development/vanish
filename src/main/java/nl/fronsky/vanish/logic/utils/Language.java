@@ -42,52 +42,13 @@ public enum Language {
     }
 
     /**
-     * Retrieves the numerical ID of this enum constant.
-     *
-     * @return the numerical ID of this enum constant
-     */
-    public int getId() {
-        return ordinal();
-    }
-
-    /**
-     * Retrieves the message associated with this enum constant.
-     *
-     * @return the message associated with this enum constant
-     */
-    public String getMessage() {
-        try {
-            if (VanishModule.getData() == null || VanishModule.getData().getMessages() == null
-                    || VanishModule.getData().getMessages().get() == null) {
-                return message;
-            }
-            String _message = VanishModule.getData().getMessages().get().getString(name().toLowerCase());
-            if (_message == null) {
-                _message = message;
-            }
-            return _message;
-        } catch (Exception e) {
-            return message;
-        }
-    }
-
-    /**
-     * Retrieves the message associated with this enum constant, with color formatting applied.
-     *
-     * @return the message associated with this enum constant with color formatting applied
-     */
-    public String getMessageWithColor() {
-        return ColorUtil.colorize(getMessage());
-    }
-
-    /**
      * Retrieves a Language enum constant based on its name.
      *
      * @param name the name of the Language enum constant to retrieve
      * @return the Language enum constant corresponding to the specified name,
      * or Language.DEFAULT if no matching enum constant is found
      */
-    public Language getLanguage(String name) {
+    public static Language getLanguage(String name) {
         Language language = null;
         for (Language obj : Language.values()) {
             if (obj.name().equalsIgnoreCase(name)) {
@@ -97,5 +58,48 @@ public enum Language {
         }
         if (language == null) language = Language.DEFAULT;
         return language;
+    }
+
+    /**
+     * Retrieves the message associated with this enum constant.
+     * Note: may contain raw {@code &} color codes from config.
+     *
+     * @return the raw message associated with this enum constant
+     */
+    public String getMessage() {
+        try {
+            if (VanishModule.getData() == null || VanishModule.getData().getMessages() == null
+                    || VanishModule.getData().getMessages().get() == null) {
+                return message;
+            }
+            String configMessage = VanishModule.getData().getMessages().get().getString(name().toLowerCase());
+            if (configMessage == null) {
+                configMessage = message;
+            }
+            return configMessage;
+        } catch (Exception e) {
+            return message;
+        }
+    }
+
+    /**
+     * Retrieves the message with all color codes stripped.
+     * Suitable for console/Logger output.
+     *
+     * @return the plain text message without any color codes
+     */
+    public String getPlainMessage() {
+        String raw = getMessage();
+        // Strip &x codes and §x codes
+        return ColorUtil.decolorize(ColorUtil.colorize(raw));
+    }
+
+    /**
+     * Retrieves the message associated with this enum constant, with color formatting applied.
+     *
+     * @return the message associated with this enum constant with color formatting applied
+     */
+    public String getMessageWithColor() {
+        return ColorUtil.colorize(getMessage());
     }
 }

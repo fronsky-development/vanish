@@ -10,13 +10,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Placeholders {
-    public Placeholders(CommandSender sender, ChatColor color, Data data, int page) {
-        // data reserved for future localization/config, keep parameter for API stability
 
-        List<String> lines = new ArrayList<>();
+    private Placeholders() {
+    }
+
+    public static void execute(CommandSender sender, ChatColor color, Data data, int page) {
+        java.util.List<String> lines = new ArrayList<>();
 
         lines.add("&7- &f%vanish_isvanished% &8» &7true/false");
         lines.add("&7- &f%vanish_status% &8» &7Vanished/Visible");
