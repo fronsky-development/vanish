@@ -4,14 +4,7 @@
 
 package nl.fronsky.vanish.logic.utils;
 
-public class Result<T> {
-    private final T value;
-    private final Exception exception;
-
-    public Result(T value, Exception exception) {
-        this.value = value;
-        this.exception = exception;
-    }
+public record Result<T>(T value, Exception exception) {
 
     /**
      * Creates a successful Result object with a result value.
@@ -40,6 +33,7 @@ public class Result<T> {
      *
      * @return the value associated with this object
      */
+    @Override
     public T value() {
         return value;
     }
@@ -49,6 +43,7 @@ public class Result<T> {
      *
      * @return the exception associated with this object
      */
+    @Override
     public Exception exception() {
         return exception;
     }

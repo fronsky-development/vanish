@@ -6,18 +6,12 @@ package nl.fronsky.vanish.module.subcommands.vanish;
 
 import nl.fronsky.vanish.logic.logging.Logger;
 import nl.fronsky.vanish.logic.utils.Language;
-import nl.fronsky.vanish.module.enums.State;
 import nl.fronsky.vanish.module.utils.Data;
-import nl.fronsky.vanish.module.utils.MetaData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;

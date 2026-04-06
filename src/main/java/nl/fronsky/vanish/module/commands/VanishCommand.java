@@ -8,7 +8,6 @@ import nl.fronsky.vanish.logic.commands.CommandHandler;
 import nl.fronsky.vanish.logic.commands.annotations.CommandClass;
 import nl.fronsky.vanish.logic.commands.annotations.SubCommandMethod;
 import nl.fronsky.vanish.logic.logging.Logger;
-import nl.fronsky.vanish.logic.utils.ColorUtil;
 import nl.fronsky.vanish.logic.utils.Language;
 import nl.fronsky.vanish.logic.utils.Result;
 import nl.fronsky.vanish.module.VanishModule;
@@ -17,7 +16,6 @@ import nl.fronsky.vanish.module.models.VanishPlayer;
 import nl.fronsky.vanish.module.subcommands.vanish.*;
 import nl.fronsky.vanish.module.utils.Data;
 import nl.fronsky.vanish.module.utils.MetaData;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

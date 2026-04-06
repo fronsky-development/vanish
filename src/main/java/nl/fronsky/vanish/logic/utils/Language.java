@@ -42,6 +42,25 @@ public enum Language {
     }
 
     /**
+     * Retrieves a Language enum constant based on its name.
+     *
+     * @param name the name of the Language enum constant to retrieve
+     * @return the Language enum constant corresponding to the specified name,
+     * or Language.DEFAULT if no matching enum constant is found
+     */
+    public static Language getLanguage(String name) {
+        Language language = null;
+        for (Language obj : Language.values()) {
+            if (obj.name().equalsIgnoreCase(name)) {
+                language = obj;
+                break;
+            }
+        }
+        if (language == null) language = Language.DEFAULT;
+        return language;
+    }
+
+    /**
      * Retrieves the message associated with this enum constant.
      *
      * @return the message associated with this enum constant
@@ -69,24 +88,5 @@ public enum Language {
      */
     public String getMessageWithColor() {
         return ColorUtil.colorize(getMessage());
-    }
-
-    /**
-     * Retrieves a Language enum constant based on its name.
-     *
-     * @param name the name of the Language enum constant to retrieve
-     * @return the Language enum constant corresponding to the specified name,
-     * or Language.DEFAULT if no matching enum constant is found
-     */
-    public static Language getLanguage(String name) {
-        Language language = null;
-        for (Language obj : Language.values()) {
-            if (obj.name().equalsIgnoreCase(name)) {
-                language = obj;
-                break;
-            }
-        }
-        if (language == null) language = Language.DEFAULT;
-        return language;
     }
 }

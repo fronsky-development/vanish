@@ -12,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.*;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -37,10 +36,10 @@ public class SilentContainerHandler {
     /**
      * Handles silent opening of a container block for a vanished player.
      *
-     * @param event       the interact event
-     * @param vanishPlayer the vanished player
-     * @param block       the clicked block
-     * @param silentChest whether silent chest is enabled
+     * @param event            the interact event
+     * @param vanishPlayer     the vanished player
+     * @param block            the clicked block
+     * @param silentChest      whether silent chest is enabled
      * @param silentEnderChest whether silent ender chest is enabled
      * @return {@code true} if the event was handled (cancelled), {@code false} otherwise
      */
