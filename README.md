@@ -9,8 +9,8 @@
 
 **Vanish** is a feature-rich, modern vanish plugin for Minecraft (Spigot/Paper) servers. It allows staff members to become completely invisible to other players, with full control over game behavior, visual indicators, and third-party integrations.
 
-**Website:** [fronsky.nl/projects/vanish](https://fronsky.nl/projects/vanish)
-**Contact:** [support@fronsky.nl](mailto:support@fronsky.nl)
+**Website:** [fronsky.nl/projects/vanish](https://fronsky.nl/projects/vanish)<br />
+**Contact:** [support@fronsky.nl](mailto:support@fronsky.nl)<br />
 
 ## Table of Contents
 
@@ -66,8 +66,9 @@ int count = VanishAPI.getVanishedPlayerCount();
 
 ### Optional Integrations
 
+
 | Integration        | Feature                                                                   |
-|--------------------|---------------------------------------------------------------------------|
+| ------------------ | ------------------------------------------------------------------------- |
 | **ProtocolLib**    | Packet-level hiding, accurate server list player count, silent containers |
 | **PlaceholderAPI** | `%vanish_...%` placeholders for use in scoreboards, tab lists, etc.       |
 | **Dynmap**         | Hide vanished players from the Dynmap web map                             |
@@ -76,15 +77,17 @@ int count = VanishAPI.getVanishedPlayerCount();
 
 ### Runtime
 
+
 | Requirement                     | Version   |
-|---------------------------------|-----------|
+| ------------------------------- | --------- |
 | Minecraft Server (Spigot/Paper) | **1.20+** |
 | Java                            | **17**    |
 
 ### Optional Plugins
 
+
 | Plugin                                                                    | Version | Purpose                             |
-|---------------------------------------------------------------------------|---------|-------------------------------------|
+| ------------------------------------------------------------------------- | ------- | ----------------------------------- |
 | [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)       | 5.4.0   | Packet-level features (recommended) |
 | [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) | 2.12.2  | Placeholder support                 |
 | [Dynmap](https://www.spigotmc.org/resources/dynmap.274/)                  | Any     | Web map hiding                      |
@@ -120,8 +123,9 @@ build/libs/Vanish-<version>.jar
 
 ## Commands
 
+
 | Command                | Description                                | Permission                       |
-|------------------------|--------------------------------------------|----------------------------------|
+| ---------------------- | ------------------------------------------ | -------------------------------- |
 | `/vanish` (alias `/v`) | Toggle vanish for yourself                 | `vanish.cmd.vanish`              |
 | `/vanish <player>`     | Toggle vanish for another player           | `vanish.cmd.vanish.others`       |
 | `/vanish help`         | Show help overview                         | `vanish.cmd.vanish.help`         |
@@ -142,10 +146,11 @@ build/libs/Vanish-<version>.jar
 
 All permissions default to **OP only**.
 
+
 | Permission                       | Description                        |
-|----------------------------------|------------------------------------|
+| -------------------------------- | ---------------------------------- |
 | `vanish.*`                       | Full access to all Vanish features |
-| `vanish.cmd.vanish`              | Use `/vanish` command              |
+| `vanish.cmd.vanish`              | Use`/vanish` command               |
 | `vanish.cmd.vanish.others`       | Toggle vanish for other players    |
 | `vanish.cmd.vanish.gui`          | Open vanish GUI                    |
 | `vanish.cmd.vanish.sound`        | Configure vanish sound             |
@@ -169,8 +174,9 @@ Use `/vanish permissions` in-game for a quick reference.
 
 > Requires [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 
+
 | Placeholder             | Description                                               |
-|-------------------------|-----------------------------------------------------------|
+| ----------------------- | --------------------------------------------------------- |
 | `%vanish_isvanished%`   | Whether the player is currently vanished (`true`/`false`) |
 | `%vanish_status%`       | Vanish status text                                        |
 | `%vanish_count%`        | Number of currently vanished players                      |
