@@ -65,6 +65,11 @@ ehthumbs.db
 !gradle/wrapper/gradle-wrapper.jar
 
 # ============================
+# Internal / Private
+# ============================
+releases/
+
+# ============================
 # Misc
 # ============================
 .mtj.tmp/
