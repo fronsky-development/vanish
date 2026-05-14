@@ -1,0 +1,52 @@
+# Message sent when a player joins the game in vanished mode without notifying other players.
+player_joined_vanished_silently: '&e{player} has joined and vanished silently.'
+
+# Message sent when a player who was vanished quits the game, indicating they are no longer in vanished mode.
+player_quit_vanished: '&e{player} has left the game and is no longer vanished.'
+
+# Message sent to other players when a player vanishes from the game, making them invisible to others.
+player_vanished: '&e{player} has vanished from the game. Poof!'
+
+# Message sent to other players when a previously vanished player becomes visible again.
+player_became_visible: '&e{player} has become visible to other players.'
+
+# Confirmation message sent to the command sender when they successfully vanish another player.
+vanish_success: '&aYou have successfully vanished {player} from the game.'
+
+# Confirmation message sent to the command sender when they successfully make a vanished player visible to others.
+visible_success: '&aYou have successfully made {player} visible to other players.'
+
+# Message sent to a player who joins the game in vanished mode, with instructions on how to become visible.
+joined_vanished: '&3You have joined the game in vanished mode. To appear, type /vanish!'
+
+# Message sent to a player when they successfully vanish themselves.
+you_vanished: '&3You have vanished from the game. Poof!'
+
+# Message sent to a player when they make themselves visible to others again.
+you_became_visible: '&3You are now visible to other players.'
+
+# Confirmation message sent to a player when they enable vanish sound effects.
+vanish_sound_enabled: '&aYou have enabled the sound when vanishing.'
+
+# Confirmation message sent to a player when they disable vanish sound effects.
+vanish_sound_disabled: '&aYou have disabled the sound when vanishing.'
+
+# Confirmation message sent to a player when they enable silent mode when joining the game.
+vanish_silent_enabled: '&aYou have enabled the silent mode when joining the game.'
+
+# Confirmation message sent to a player when they disable silent mode when joining the game.
+vanish_silent_disabled: '&aYou have disabled the silent mode when joining the game.'
+
+# Message sent when the Vanish plugin is reloaded successfully.
+plugin_reloaded: '&aThe Fronsky Vanish plugin has been reloaded successfully!'
+
+# Permission overview lines used by /vanish permissions
+# You can fully customize this list.
+permissions_header: '&8<--------------- {color}&lVanish Permissions&8 --------------->'
+permissions_footer: '&8<------------------------------------------->'
+
+# Header/footer used by /vanish placeholders
+placeholders_header: '&8<--------------- {color}&lVanish Placeholders&8 --------------->'
+placeholders_footer: '&8<------------------------------------------->'
+
+# (The actual permission/placeholder lines are fixed in code to keep configuration manageable.)
