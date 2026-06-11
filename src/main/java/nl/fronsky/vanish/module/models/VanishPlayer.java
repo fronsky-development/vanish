@@ -19,12 +19,16 @@ import nl.fronsky.vanish.module.utils.MetaData;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class VanishPlayer {
     private static final String METADATA_KEY = "fronsky_vanish";
+    private static final String FLIGHT_METADATA_KEY = "fronsky_vanish_flight";
+    private static final String NIGHT_VISION_METADATA_KEY = "fronsky_vanish_nightvision";
     private final Data data;
     @Getter
     private final Player player;
@@ -106,10 +110,22 @@ public class VanishPlayer {
         player.setMetadata(METADATA_KEY, new FixedMetadataValue(data.getPlugin(), true));
         player.setCollidable(!data.getConfig().get().getBoolean("disabled-actions.player-push"));
         player.setCanPickupItems(!data.getConfig().get().getBoolean("disabled-actions.pickup-items"));
+        // Apply night vision effect
+        if (data.getConfig().get().getBoolean("vanish-effects.night-vision", false)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
+            player.setMetadata(NIGHT_VISION_METADATA_KEY, new FixedMetadataValue(data.getPlugin(), true));
+        }
+
+        // Apply flight
+        if (data.getConfig().get().getBoolean("vanish-effects.allow-flight", false)) {
+            player.setMetadata(FLIGHT_METADATA_KEY, new FixedMetadataValue(data.getPlugin(), player.getAllowFlight()));
+            player.setAllowFlight(true);
+            player.setFlying(true);
+        }
+
         data.getVanishedPlayers().put(uuid, this);
         data.getVanishedBossBar().addPlayer(player);
         Dynmap.hide(player);
-        MetaData.invalidateCache(uuid);
         Logger.debug("Player " + name + " is now hidden");
         Bukkit.getServer().getPluginManager().callEvent(new VisibilityChangeEvent(this, join));
     }
@@ -124,10 +140,24 @@ public class VanishPlayer {
         player.removeMetadata(METADATA_KEY, data.getPlugin());
         player.setCollidable(true);
         player.setCanPickupItems(true);
+
+        // Remove night vision effect
+        if (player.hasMetadata(NIGHT_VISION_METADATA_KEY)) {
+            player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            player.removeMetadata(NIGHT_VISION_METADATA_KEY, data.getPlugin());
+        }
+
+        // Restore flight state
+        if (player.hasMetadata(FLIGHT_METADATA_KEY)) {
+            boolean originalAllowFlight = player.getMetadata(FLIGHT_METADATA_KEY).get(0).asBoolean();
+            player.removeMetadata(FLIGHT_METADATA_KEY, data.getPlugin());
+            player.setFlying(false);
+            player.setAllowFlight(originalAllowFlight);
+        }
+
         data.getVanishedPlayers().remove(uuid);
         data.getVanishedBossBar().removePlayer(player);
         Dynmap.show(player);
-        MetaData.invalidateCache(uuid);
         Logger.debug("Player " + name + " is now visible");
         Bukkit.getServer().getPluginManager().callEvent(new VisibilityChangeEvent(this, quit));
     }

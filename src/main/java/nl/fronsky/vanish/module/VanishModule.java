@@ -25,6 +25,7 @@ import nl.fronsky.vanish.module.utils.Data;
 import nl.fronsky.vanish.module.utils.Dynmap;
 import nl.fronsky.vanish.module.utils.MetaData;
 import org.bukkit.Bukkit;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +104,9 @@ public class VanishModule extends Module {
             data.getVanishedBossBar().removePlayer(vanishPlayer.getPlayer());
             vanishPlayer.getPlayer().setCollidable(true);
             vanishPlayer.getPlayer().setCanPickupItems(true);
+            vanishPlayer.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+            vanishPlayer.getPlayer().setFlying(false);
+            vanishPlayer.getPlayer().setAllowFlight(false);
             vanishPlayer.getPlayer().removeMetadata("fronsky_vanish", data.getPlugin());
             Dynmap.show(vanishPlayer.getPlayer());
         }
