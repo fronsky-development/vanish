@@ -33,6 +33,10 @@ public enum Language {
     PLUGIN_RELOADED("&aThe Fronsky (r) Vanish plugin has been reloaded successfully!"),
     PLAYER_NOT_FOUND("We were unable to find a player in the server based on the given data."),
     MESSAGE_NOT_VALID("The message sent to {player} was not valid."),
+    NOTIFICATION_VANISHED_ACTIONBAR("&3You are now vanished"),
+    NOTIFICATION_VISIBLE_ACTIONBAR("&3You are now visible"),
+    NOTIFICATION_VANISHED_TITLE("&3Vanished"),
+    NOTIFICATION_VISIBLE_TITLE("&3Visible"),
     ;
 
     private final String message;

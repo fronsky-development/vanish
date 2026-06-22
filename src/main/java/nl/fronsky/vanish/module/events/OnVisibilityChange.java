@@ -4,6 +4,8 @@
 
 package nl.fronsky.vanish.module.events;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import nl.fronsky.vanish.logic.utils.Language;
 import nl.fronsky.vanish.module.VanishModule;
 import nl.fronsky.vanish.module.events.custom.VisibilityChangeEvent;
@@ -60,6 +62,7 @@ public class OnVisibilityChange implements Listener {
             protocolLib.updateOnlinePlayers(data, player, false);
         }
         player.sendMessage(selfMessageKey.getMessageWithColor());
+        sendNotifications(player, true);
     }
 
     /**
@@ -83,5 +86,27 @@ public class OnVisibilityChange implements Listener {
             protocolLib.updateOnlinePlayers(data, player, action);
         }
         player.sendMessage(Language.YOU_BECAME_VISIBLE.getMessageWithColor());
+        sendNotifications(player, false);
+    }
+
+    /**
+     * Sends actionbar and/or title notifications to the player based on config.
+     *
+     * @param player  the player to notify
+     * @param vanished true if the player just vanished, false if they became visible
+     */
+    private void sendNotifications(VanishPlayer player, boolean vanished) {
+        if (data.getConfig().get().getBoolean("notifications.actionbar", false)) {
+            String msg = vanished
+                    ? Language.NOTIFICATION_VANISHED_ACTIONBAR.getMessageWithColor()
+                    : Language.NOTIFICATION_VISIBLE_ACTIONBAR.getMessageWithColor();
+            player.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(msg));
+        }
+        if (data.getConfig().get().getBoolean("notifications.title", false)) {
+            String title = vanished
+                    ? Language.NOTIFICATION_VANISHED_TITLE.getMessageWithColor()
+                    : Language.NOTIFICATION_VISIBLE_TITLE.getMessageWithColor();
+            player.getPlayer().sendTitle(title, "", 10, 40, 10);
+        }
     }
 }

@@ -127,6 +127,22 @@ public class Data {
             cfg.set("disabled-actions.pickup-items", true);
             modified = true;
         }
+        if (!cfg.contains("vanish-effects.night-vision")) {
+            cfg.set("vanish-effects.night-vision", true);
+            modified = true;
+        }
+        if (!cfg.contains("vanish-effects.allow-flight")) {
+            cfg.set("vanish-effects.allow-flight", true);
+            modified = true;
+        }
+        if (!cfg.contains("notifications.actionbar")) {
+            cfg.set("notifications.actionbar", true);
+            modified = true;
+        }
+        if (!cfg.contains("notifications.title")) {
+            cfg.set("notifications.title", true);
+            modified = true;
+        }
 
         if (modified) {
             config.save();
@@ -225,6 +241,5 @@ public class Data {
         if (protocolLib != null) {
             protocolLib.cleanup();
         }
-        MetaData.clearCache();
     }
 }

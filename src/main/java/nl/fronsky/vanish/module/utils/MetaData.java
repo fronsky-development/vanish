@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.UUID;
 
 public class MetaData {
 
@@ -55,21 +54,5 @@ public class MetaData {
         }
 
         return State.VISIBLE;
-    }
-
-    /**
-     * Clears the player state cache. (No-op, kept for API compatibility.)
-     */
-    public static void clearCache() {
-        // No-op: dead cache removed in R-13
-    }
-
-    /**
-     * Invalidates cache for a specific player. (No-op, kept for API compatibility.)
-     *
-     * @param uuid the UUID of the player to invalidate
-     */
-    public static void invalidateCache(UUID uuid) {
-        // No-op: dead cache removed in R-13
     }
 }

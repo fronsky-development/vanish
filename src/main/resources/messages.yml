@@ -49,4 +49,10 @@ permissions_footer: '&8<------------------------------------------->'
 placeholders_header: '&8<--------------- {color}&lVanish Placeholders&8 --------------->'
 placeholders_footer: '&8<------------------------------------------->'
 
+# Notification messages shown via actionbar/title when vanish state changes.
+notification_vanished_actionbar: '&3You are now vanished'
+notification_visible_actionbar: '&3You are now visible'
+notification_vanished_title: '&3Vanished'
+notification_visible_title: '&3Visible'
+
 # (The actual permission/placeholder lines are fixed in code to keep configuration manageable.)

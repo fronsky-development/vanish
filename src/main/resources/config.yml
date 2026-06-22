@@ -19,5 +19,15 @@ disabled-actions:
   player-push: true
   pickup-items: true
 
+# Effects applied to the player when they are vanished.
+vanish-effects:
+  night-vision: true
+  allow-flight: true
+
+# Notifications shown to the player when their vanish status changes.
+notifications:
+  actionbar: true
+  title: true
+
 # Defines the color used in plugin messages for enhanced readability or thematic consistency.
 plugin-color: 'BLUE'
