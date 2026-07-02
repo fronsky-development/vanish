@@ -13,6 +13,8 @@ import nl.fronsky.vanish.logic.utils.ColorUtil;
 import nl.fronsky.vanish.module.events.DisabledActions;
 import nl.fronsky.vanish.module.models.VanishPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -28,6 +30,7 @@ public class Data {
     private final Plugin plugin;
     private final IFile<FileConfiguration> config, messages, players;
     private final Map<UUID, VanishPlayer> vanishedPlayers;
+    private final Map<UUID, Boolean> advancementAnnouncementRules;
     private final BossBar vanishedBossBar;
     private final ProtocolLib protocolLib;
 
@@ -40,6 +43,7 @@ public class Data {
         messages = new YmlFile("messages");
         players = new YmlFile("players");
         vanishedPlayers = new ConcurrentHashMap<>();
+        advancementAnnouncementRules = new ConcurrentHashMap<>();
 
         // Load configuration and validate
         validateConfiguration();
@@ -119,6 +123,10 @@ public class Data {
             cfg.set("disabled-actions.death-messages", true);
             modified = true;
         }
+        if (!cfg.contains("disabled-actions.advancements")) {
+            cfg.set("disabled-actions.advancements", true);
+            modified = true;
+        }
         if (!cfg.contains("disabled-actions.player-push")) {
             cfg.set("disabled-actions.player-push", true);
             modified = true;
@@ -168,8 +176,34 @@ public class Data {
         if (disabledActions != null) {
             disabledActions.reloadConfig();
         }
+        updateAdvancementAnnouncements();
 
         Logger.info("Configurations reloaded successfully!");
+    }
+
+    public void updateAdvancementAnnouncements() {
+        if (!config.get().getBoolean("disabled-actions.advancements", true) || vanishedPlayers.isEmpty()) {
+            restoreAdvancementAnnouncements();
+            return;
+        }
+
+        for (World world : Bukkit.getWorlds()) {
+            advancementAnnouncementRules.putIfAbsent(world.getUID(),
+                    Boolean.TRUE.equals(world.getGameRuleValue(GameRule.ANNOUNCE_ADVANCEMENTS)));
+            if (Boolean.TRUE.equals(world.getGameRuleValue(GameRule.ANNOUNCE_ADVANCEMENTS))) {
+                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+            }
+        }
+    }
+
+    public void restoreAdvancementAnnouncements() {
+        for (Map.Entry<UUID, Boolean> entry : advancementAnnouncementRules.entrySet()) {
+            World world = Bukkit.getWorld(entry.getKey());
+            if (world != null) {
+                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, entry.getValue());
+            }
+        }
+        advancementAnnouncementRules.clear();
     }
 
     /**
@@ -238,6 +272,7 @@ public class Data {
      * Cleans up resources when the plugin is disabled.
      */
     public void cleanup() {
+        restoreAdvancementAnnouncements();
         if (protocolLib != null) {
             protocolLib.cleanup();
         }

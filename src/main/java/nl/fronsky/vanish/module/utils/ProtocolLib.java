@@ -11,10 +11,12 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedServerPing;
 import nl.fronsky.vanish.logic.logging.Logger;
 import nl.fronsky.vanish.module.enums.State;
 import nl.fronsky.vanish.module.models.VanishPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -23,9 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtocolLib {
     private static final long SILENT_CONTAINER_TTL_MS = 2500; // enough for open + close animation/sounds
+    private static final long ADVANCEMENT_ANNOUNCEMENT_TTL_MS = 5000;
     private final Set<PacketAdapter> registeredAdapters = new HashSet<>();
     // Players currently opening containers in "silent" mode.
     private final Set<UUID> silentContainerPlayers = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, PendingAdvancementAnnouncement> advancementAnnouncements = new ConcurrentHashMap<>();
     /**
      * Cache of last silent container interactions.
      * Keyed by vanished player's UUID so we can support multiple vanished players at once.
@@ -34,6 +38,7 @@ public class ProtocolLib {
     // We register these once and keep them for the lifetime of the plugin.
     private PacketAdapter serverInfoAdapter;
     private PacketAdapter silentContainerAdapter;
+    private PacketAdapter advancementChatAdapter;
 
     /**
      * Enable ProtocolLib hooks. Call once on plugin enable.
@@ -44,6 +49,7 @@ public class ProtocolLib {
         try {
             registerServerInfoAdapter(data);
             registerSilentContainerAdapter(data);
+            registerAdvancementChatAdapter(data);
             Logger.info("ProtocolLib hooks enabled.");
         } catch (Exception e) {
             Logger.exception("Failed to enable ProtocolLib hooks", e);
@@ -61,6 +67,22 @@ public class ProtocolLib {
 
     public boolean isSilentContainer(Player player) {
         return player != null && silentContainerPlayers.contains(player.getUniqueId());
+    }
+
+    public void suppressAdvancementAnnouncement(Player player) {
+        if (player == null) return;
+
+        String name = player.getName().toLowerCase(Locale.ROOT);
+        String displayName = ChatColor.stripColor(player.getDisplayName());
+        if (displayName == null || displayName.isBlank()) {
+            displayName = player.getName();
+        }
+
+        advancementAnnouncements.put(player.getUniqueId(), new PendingAdvancementAnnouncement(
+                name,
+                displayName.toLowerCase(Locale.ROOT),
+                System.currentTimeMillis() + ADVANCEMENT_ANNOUNCEMENT_TTL_MS
+        ));
     }
 
     /**
@@ -202,6 +224,39 @@ public class ProtocolLib {
         }
     }
 
+    private void registerAdvancementChatAdapter(Data data) {
+        try {
+            ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+
+            if (advancementChatAdapter != null) {
+                pm.removePacketListener(advancementChatAdapter);
+                registeredAdapters.remove(advancementChatAdapter);
+            }
+
+            advancementChatAdapter = new PacketAdapter(data.getPlugin(), ListenerPriority.HIGHEST,
+                    PacketType.Play.Server.SYSTEM_CHAT,
+                    PacketType.Play.Server.CHAT,
+                    PacketType.Play.Server.DISGUISED_CHAT
+            ) {
+                @Override
+                public void onPacketSending(PacketEvent event) {
+                    try {
+                        if (shouldCancelAdvancementAnnouncement(event)) {
+                            event.setCancelled(true);
+                        }
+                    } catch (Exception e) {
+                        Logger.debug("Advancement announcement packet error: " + e.getMessage());
+                    }
+                }
+            };
+
+            pm.addPacketListener(advancementChatAdapter);
+            registeredAdapters.add(advancementChatAdapter);
+        } catch (Exception e) {
+            Logger.exception("Failed to register advancement chat adapter", e);
+        }
+    }
+
     /**
      * Call when a vanished player is about to open a container silently.
      * This enables packet suppression for the opener AND for observers around the container location.
@@ -226,6 +281,17 @@ public class ProtocolLib {
         Iterator<Map.Entry<UUID, SilentContainerContext>> it = silentContainerContext.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<UUID, SilentContainerContext> entry = it.next();
+            if (entry.getValue() == null || entry.getValue().expiresAt < now) {
+                it.remove();
+            }
+        }
+    }
+
+    private void cleanupExpiredAdvancementAnnouncements() {
+        long now = System.currentTimeMillis();
+        Iterator<Map.Entry<UUID, PendingAdvancementAnnouncement>> it = advancementAnnouncements.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<UUID, PendingAdvancementAnnouncement> entry = it.next();
             if (entry.getValue() == null || entry.getValue().expiresAt < now) {
                 it.remove();
             }
@@ -280,11 +346,76 @@ public class ProtocolLib {
             registeredAdapters.clear();
             serverInfoAdapter = null;
             silentContainerAdapter = null;
+            advancementChatAdapter = null;
             silentContainerPlayers.clear();
+            advancementAnnouncements.clear();
             Logger.debug("ProtocolLib packet listeners cleaned up");
         } catch (Exception e) {
             Logger.exception("Failed to cleanup ProtocolLib listeners", e);
         }
+    }
+
+    private boolean shouldCancelAdvancementAnnouncement(PacketEvent event) {
+        cleanupExpiredAdvancementAnnouncements();
+        if (advancementAnnouncements.isEmpty()) {
+            return false;
+        }
+
+        String packetText = readPacketText(event);
+        if (packetText == null) {
+            return false;
+        }
+
+        String normalized = packetText.toLowerCase(Locale.ROOT);
+
+        for (PendingAdvancementAnnouncement announcement : advancementAnnouncements.values()) {
+            if (announcement == null) {
+                continue;
+            }
+            boolean containsPlayer = (!announcement.name.isEmpty() && normalized.contains(announcement.name))
+                    || (!announcement.displayName.isEmpty() && normalized.contains(announcement.displayName));
+            boolean containsAdvancement = normalized.contains("chat.type.advancement.")
+                    || normalized.contains("has made the advancement")
+                    || normalized.contains("has reached the goal")
+                    || normalized.contains("has completed the challenge")
+                    || normalized.contains("advancement");
+            if (containsPlayer && containsAdvancement) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private String readPacketText(PacketEvent event) {
+        StringBuilder builder = new StringBuilder();
+
+        try {
+            StructureModifier<WrappedChatComponent> components = event.getPacket().getChatComponents();
+            for (int i = 0; i < components.size(); i++) {
+                WrappedChatComponent component = components.read(i);
+                if (component != null && component.getJson() != null) {
+                    builder.append(component.getJson()).append(' ');
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            StructureModifier<Object> modifier = event.getPacket().getModifier();
+            for (int i = 0; i < modifier.size(); i++) {
+                Object value = modifier.read(i);
+                if (value != null) {
+                    builder.append(value).append(' ');
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (builder.isEmpty()) {
+            return null;
+        }
+        return builder.toString();
     }
 
     private boolean isContainerSound(PacketEvent event) {
@@ -333,5 +464,8 @@ public class ProtocolLib {
     }
 
     private record SilentContainerContext(Location location, long expiresAt) {
+    }
+
+    private record PendingAdvancementAnnouncement(String name, String displayName, long expiresAt) {
     }
 }
