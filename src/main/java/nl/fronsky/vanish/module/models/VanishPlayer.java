@@ -124,6 +124,7 @@ public class VanishPlayer {
         }
 
         data.getVanishedPlayers().put(uuid, this);
+        data.updateAdvancementAnnouncements();
         data.getVanishedBossBar().addPlayer(player);
         Dynmap.hide(player);
         Logger.debug("Player " + name + " is now hidden");
@@ -156,6 +157,7 @@ public class VanishPlayer {
         }
 
         data.getVanishedPlayers().remove(uuid);
+        data.updateAdvancementAnnouncements();
         data.getVanishedBossBar().removePlayer(player);
         Dynmap.show(player);
         Logger.debug("Player " + name + " is now visible");

@@ -13,6 +13,7 @@ import org.bukkit.block.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -20,13 +21,17 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.WorldLoadEvent;
+
+import java.lang.reflect.Method;
 
 public class DisabledActions implements Listener {
     private final Data data;
     private final SilentContainerHandler silentContainerHandler;
     private boolean disabledDamage, disabledHunger, disabledMobTarget, disabledSilentChest, disabledSilentEnderChest,
-            disabledPressurePlates, disabledDeathMessages;
+            disabledPressurePlates, disabledDeathMessages, disabledAdvancements;
 
     public DisabledActions() {
         data = VanishModule.getData();
@@ -47,6 +52,7 @@ public class DisabledActions implements Listener {
         disabledSilentEnderChest = file.getBoolean("disabled-actions.silent-ender-chest");
         disabledPressurePlates = file.getBoolean("disabled-actions.pressure-plates");
         disabledDeathMessages = file.getBoolean("disabled-actions.death-messages");
+        disabledAdvancements = file.getBoolean("disabled-actions.advancements");
     }
 
     @EventHandler
@@ -97,6 +103,26 @@ public class DisabledActions implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void playerAdvancementDone(PlayerAdvancementDoneEvent event) {
+        Player player = event.getPlayer();
+        if (!disabledAdvancements || MetaData.getVanishState(player, data).equals(State.VISIBLE)) {
+            return;
+        }
+
+        suppressPaperAdvancementMessage(event);
+        if (data.getProtocolLib() != null) {
+            data.getProtocolLib().suppressAdvancementAnnouncement(player);
+        }
+    }
+
+    @EventHandler
+    public void worldLoad(WorldLoadEvent event) {
+        if (disabledAdvancements) {
+            data.updateAdvancementAnnouncements();
+        }
+    }
+
     @EventHandler
     public void playerInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
@@ -136,4 +162,19 @@ public class DisabledActions implements Listener {
         VanishPlayer vanishPlayer = new VanishPlayer((Player) event.getPlayer());
         silentContainerHandler.handleInventoryClose(vanishPlayer);
     }
+
+    private void suppressPaperAdvancementMessage(PlayerAdvancementDoneEvent event) {
+        for (Method method : event.getClass().getMethods()) {
+            if (!method.getName().equals("message") || method.getParameterCount() != 1) {
+                continue;
+            }
+
+            try {
+                method.invoke(event, new Object[]{null});
+            } catch (Exception ignored) {
+            }
+            return;
+        }
+    }
+
 }

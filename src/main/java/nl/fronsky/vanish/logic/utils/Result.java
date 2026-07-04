@@ -29,26 +29,6 @@ public record Result<T>(T value, Exception exception) {
     }
 
     /**
-     * Retrieves the value associated with this object.
-     *
-     * @return the value associated with this object
-     */
-    @Override
-    public T value() {
-        return value;
-    }
-
-    /**
-     * Retrieves the exception associated with this object.
-     *
-     * @return the exception associated with this object
-     */
-    @Override
-    public Exception exception() {
-        return exception;
-    }
-
-    /**
      * Checks if the operation was successful.
      *
      * @return {@code true} if the operation was successful; {@code false} otherwise

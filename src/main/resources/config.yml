@@ -16,6 +16,7 @@ disabled-actions:
   silent-ender-chest: true
   pressure-plates: true
   death-messages: true
+  advancements: true
   player-push: true
   pickup-items: true
 
