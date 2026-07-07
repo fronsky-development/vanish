@@ -32,3 +32,12 @@ notifications:
 
 # Defines the color used in plugin messages for enhanced readability or thematic consistency.
 plugin-color: 'BLUE'
+
+# Boss bar shown to players while they are vanished.
+bossbar:
+  # Set to false to disable the vanish boss bar entirely.
+  enabled: true
+  # The text shown on the boss bar. Supports color codes (&).
+  title: "&bYou are currently vanished"
+  # The boss bar style: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+  style: 'SOLID'

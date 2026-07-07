@@ -169,6 +169,16 @@ Compiled against Spigot API 1.20. Compatible with 1.21+ by avoiding NMS/CraftBuk
 
 Found a bug? Open an issue on [GitHub](https://github.com/fronsky-development/vanish/issues) with your Minecraft version, server software, plugin version (`/vanish info`), steps to reproduce, and any console errors.
 
+## Contributing
+
+Contributions are welcome! This repository is public and source-available. Before you start, please read:
+
+- [Contributing Guidelines](CONTRIBUTING.md) — how to build, code style, and the pull request process
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md) — how to report vulnerabilities privately
+
+> Note: Vanish is proprietary software (see [LICENSE](LICENSE)). By contributing you agree that your changes are distributed under the project license.
+
 ## License
 
 Copyright &copy; 2025-2026 Fronsky. All Rights Reserved.

@@ -4,6 +4,15 @@
 
 package nl.fronsky.vanish.logic.utils;
 
+import java.util.Objects;
+
+/**
+ * An immutable result of an operation that either succeeds with a value or fails with an exception.
+ *
+ * @param value     the value produced on success, or {@code null} on failure
+ * @param exception the exception describing the failure, or {@code null} on success
+ * @param <T>       the type of the success value
+ */
 public record Result<T>(T value, Exception exception) {
 
     /**
@@ -25,7 +34,7 @@ public record Result<T>(T value, Exception exception) {
      * @return a new Result object representing a failed operation with the specified exception
      */
     public static <T> Result<T> fail(Exception exception) {
-        return new Result<>(null, exception);
+        return new Result<>(null, Objects.requireNonNull(exception, "exception must not be null"));
     }
 
     /**
@@ -35,16 +44,5 @@ public record Result<T>(T value, Exception exception) {
      */
     public boolean success() {
         return exception == null;
-    }
-
-    /**
-     * Checks if the exception associated with this object is of a specific type.
-     *
-     * @param exceptionClass the class representing the type of exception to check for
-     * @return {@code true} if the exception associated with this object is an instance
-     * of the specified type; {@code false} otherwise
-     */
-    public boolean isExceptionType(Class<? extends Exception> exceptionClass) {
-        return exceptionClass.isInstance(exception);
     }
 }

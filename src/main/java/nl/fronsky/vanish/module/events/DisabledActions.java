@@ -118,7 +118,7 @@ public class DisabledActions implements Listener {
 
     @EventHandler
     public void worldLoad(WorldLoadEvent event) {
-        if (disabledAdvancements) {
+        if (disabledAdvancements && data.useAdvancementGameruleFallback()) {
             data.updateAdvancementAnnouncements();
         }
     }

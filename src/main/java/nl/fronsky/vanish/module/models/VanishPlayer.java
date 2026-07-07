@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class VanishPlayer {
-    private static final String METADATA_KEY = "fronsky_vanish";
+    private static final String METADATA_KEY = "vanished";
     private static final String FLIGHT_METADATA_KEY = "fronsky_vanish_flight";
     private static final String NIGHT_VISION_METADATA_KEY = "fronsky_vanish_nightvision";
     private final Data data;
@@ -125,7 +125,9 @@ public class VanishPlayer {
 
         data.getVanishedPlayers().put(uuid, this);
         data.updateAdvancementAnnouncements();
-        data.getVanishedBossBar().addPlayer(player);
+        if (data.isBossBarEnabled()) {
+            data.getVanishedBossBar().addPlayer(player);
+        }
         Dynmap.hide(player);
         Logger.debug("Player " + name + " is now hidden");
         Bukkit.getServer().getPluginManager().callEvent(new VisibilityChangeEvent(this, join));

@@ -49,7 +49,7 @@ public class MetaData {
             return State.VISIBLE;
         }
 
-        if (player.hasMetadata("fronsky_vanish") && data.getVanishedPlayers().containsKey(player.getUniqueId())) {
+        if (player.hasMetadata("vanished") && data.getVanishedPlayers().containsKey(player.getUniqueId())) {
             return State.HIDDEN;
         }
 

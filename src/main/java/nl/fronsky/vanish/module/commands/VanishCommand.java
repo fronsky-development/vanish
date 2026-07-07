@@ -16,6 +16,8 @@ import nl.fronsky.vanish.module.models.VanishPlayer;
 import nl.fronsky.vanish.module.subcommands.vanish.*;
 import nl.fronsky.vanish.module.utils.Data;
 import nl.fronsky.vanish.module.utils.MetaData;
+import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -171,5 +173,34 @@ public class VanishCommand extends CommandHandler {
             }
         }
         Placeholders.execute(sender, data.getPluginChatColor(), data, page);
+    }
+
+    @Override
+    protected java.util.List<String> getArgumentCompletions(CommandSender sender, String subcommand, String[] args) {
+        if (args.length != 2) {
+            return new java.util.ArrayList<>();
+        }
+
+        switch (subcommand.toLowerCase()) {
+            case "tp": {
+                java.util.List<String> players = new java.util.ArrayList<>();
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    players.add(online.getName());
+                }
+                return players;
+            }
+            case "sound":
+            case "silent":
+                return java.util.Arrays.asList("on", "off");
+            case "color": {
+                java.util.List<String> colors = new java.util.ArrayList<>();
+                for (BarColor barColor : BarColor.values()) {
+                    colors.add(barColor.name().toLowerCase());
+                }
+                return colors;
+            }
+            default:
+                return new java.util.ArrayList<>();
+        }
     }
 }

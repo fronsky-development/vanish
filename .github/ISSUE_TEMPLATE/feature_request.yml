@@ -1,0 +1,66 @@
+name: Feature Request
+description: Suggest an idea or improvement for Vanish
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe your idea clearly so we can
+        understand the problem it solves.
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Related area
+      description: Which part of the plugin does this idea relate to?
+      options:
+        - Vanish core (invisibility / join & quit)
+        - Disabled actions
+        - Silent containers
+        - Boss bar indicator
+        - Player head GUI
+        - Commands / permissions
+        - Configuration (config.yml / messages.yml)
+        - ProtocolLib integration
+        - PlaceholderAPI integration / placeholders
+        - Dynmap integration
+        - New integration
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: Is your feature request related to a problem? Describe it.
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you imagine the feature working.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or features you've considered.
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
