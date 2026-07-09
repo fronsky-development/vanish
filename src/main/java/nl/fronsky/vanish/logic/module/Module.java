@@ -64,14 +64,14 @@ public abstract class Module implements IModule {
      */
     public Result<String> load() {
         if (!moduleStatus.equals(Status.IDLE)) {
-            return new Result<>(null, new Exception("An attempt was made to load the " + moduleName + " while it was not idle."));
+            return Result.fail(new Exception("An attempt was made to load the " + moduleName + " while it was not idle."));
         }
 
         moduleStatus = Status.LOADING;
         Logger.info("Loading " + moduleName + "...");
         onLoad();
         moduleStatus = Status.LOADED;
-        return new Result<>("Module has been successfully loaded.", null);
+        return Result.ok("Module has been successfully loaded.");
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class Module implements IModule {
      */
     public Result<String> enable() {
         if (!moduleStatus.equals(Status.LOADED)) {
-            return new Result<>(null, new Exception("An attempt was made to enable the " + moduleName + " while it was not loaded."));
+            return Result.fail(new Exception("An attempt was made to enable the " + moduleName + " while it was not loaded."));
         }
 
         moduleStatus = Status.ENABLING;
@@ -89,13 +89,13 @@ public abstract class Module implements IModule {
         try {
             onEnable();
             moduleStatus = Status.ENABLED;
-            return new Result<>("Module has been successfully enabled.", null);
+            return Result.ok("Module has been successfully enabled.");
         } catch (Exception e) {
             moduleStatus = Status.DISABLING;
             Logger.severe(e.getMessage());
             Bukkit.shutdown();
             moduleStatus = Status.DISABLED;
-            return new Result<>(null, e);
+            return Result.fail(e);
         }
     }
 
@@ -106,7 +106,7 @@ public abstract class Module implements IModule {
      */
     public Result<String> disable() {
         if (!moduleStatus.equals(Status.ENABLED)) {
-            return new Result<>(null, new Exception("An attempt was made to disable the " + moduleName + " while it was not enabled."));
+            return Result.fail(new Exception("An attempt was made to disable the " + moduleName + " while it was not enabled."));
         }
 
         moduleStatus = Status.DISABLING;
@@ -130,7 +130,7 @@ public abstract class Module implements IModule {
         tasks.clear();
         onDisable();
         moduleStatus = Status.DISABLED;
-        return new Result<>("Module has been successfully disabled.", null);
+        return Result.ok("Module has been successfully disabled.");
     }
 
     /**

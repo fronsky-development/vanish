@@ -101,11 +101,55 @@ public abstract class CommandHandler implements TabCompleter, CommandExecutor, I
         Player player = (sender instanceof Player) ? (Player) sender : null;
 
         if (args.length == 1) {
+            String prefix = args[0].toLowerCase();
             subcommands.stream()
-                    .filter(subcommand -> subcommand.startsWith(args[0]) && (player != null && hasPermission(player, permission + "." + subcommand)))
+                    .filter(subcommand -> subcommand.toLowerCase().startsWith(prefix)
+                            && hasPermissionSilent(player, permission + "." + subcommand.toLowerCase()))
                     .forEach(completions::add);
+        } else if (args.length > 1) {
+            String subcommand = getSubcommand(args);
+            if (!subcommand.isEmpty() && hasPermissionSilent(player, permission + "." + subcommand.toLowerCase())) {
+                List<String> suggestions = getArgumentCompletions(sender, subcommand, args);
+                if (suggestions != null) {
+                    String prefix = args[args.length - 1].toLowerCase();
+                    suggestions.stream()
+                            .filter(suggestion -> suggestion != null && suggestion.toLowerCase().startsWith(prefix))
+                            .forEach(completions::add);
+                }
+            }
         }
         return completions;
+    }
+
+    /**
+     * Provides contextual tab completions for the arguments of a subcommand.
+     * Subclasses can override this to suggest values such as online players or fixed options.
+     *
+     * @param sender     the command sender requesting completions
+     * @param subcommand the resolved subcommand name
+     * @param args       the full argument array (args[0] is the subcommand)
+     * @return a list of possible completions, or an empty list if there are none
+     */
+    protected List<String> getArgumentCompletions(CommandSender sender, String subcommand, String[] args) {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Checks whether a player has a permission without sending any feedback message.
+     * Used for tab completion, where messaging the player would be inappropriate.
+     *
+     * @param player     the player to check, or {@code null} for non-player senders
+     * @param permission the permission node to check
+     * @return {@code true} if the sender is allowed
+     */
+    protected boolean hasPermissionSilent(Player player, String permission) {
+        if (player == null) {
+            return true;
+        }
+        if (permission == null || permission.isEmpty()) {
+            return false;
+        }
+        return player.hasPermission("vanish.*") || player.hasPermission(permission);
     }
 
     /**

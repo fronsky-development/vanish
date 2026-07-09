@@ -4,7 +4,7 @@ plugins {
 
 def plugin_name = 'Vanish'
 def plugin_group = 'nl.fronsky'
-def plugin_version = '3.1.0'
+def plugin_version = '3.1.1'
 def spigot_version = '1.20'
 def java_version = 17
 

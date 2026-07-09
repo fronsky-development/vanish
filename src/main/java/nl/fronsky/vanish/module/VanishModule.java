@@ -16,6 +16,7 @@ import nl.fronsky.vanish.module.enums.State;
 import nl.fronsky.vanish.module.events.DisabledActions;
 import nl.fronsky.vanish.module.events.OnJoin;
 import nl.fronsky.vanish.module.events.OnQuit;
+import nl.fronsky.vanish.module.events.OnServerListPing;
 import nl.fronsky.vanish.module.events.OnVisibilityChange;
 import nl.fronsky.vanish.module.events.gui.Color;
 import nl.fronsky.vanish.module.events.gui.Player;
@@ -78,6 +79,7 @@ public class VanishModule extends Module {
         event(OnJoin::new);
         event(OnQuit::new);
         event(OnVisibilityChange::new);
+        event(OnServerListPing::new);
         command(VanishCommand::new);
         for (VanishPlayer vanishPlayer : MetaData.getOnlinePlayers()) {
             if (vanishPlayer.hasPermission("vanish.join")) {
@@ -107,7 +109,7 @@ public class VanishModule extends Module {
             vanishPlayer.getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
             vanishPlayer.getPlayer().setFlying(false);
             vanishPlayer.getPlayer().setAllowFlight(false);
-            vanishPlayer.getPlayer().removeMetadata("fronsky_vanish", data.getPlugin());
+            vanishPlayer.getPlayer().removeMetadata("vanished", data.getPlugin());
             Dynmap.show(vanishPlayer.getPlayer());
         }
 

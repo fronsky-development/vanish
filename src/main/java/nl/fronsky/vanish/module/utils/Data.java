@@ -13,12 +13,16 @@ import nl.fronsky.vanish.logic.utils.ColorUtil;
 import nl.fronsky.vanish.module.events.DisabledActions;
 import nl.fronsky.vanish.module.models.VanishPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +32,8 @@ public class Data {
     private final Plugin plugin;
     private final IFile<FileConfiguration> config, messages, players;
     private final Map<UUID, VanishPlayer> vanishedPlayers;
+    private final Map<UUID, Boolean> advancementAnnouncementRules;
+    private final boolean advancementMessageApiAvailable;
     private final BossBar vanishedBossBar;
     private final ProtocolLib protocolLib;
 
@@ -40,6 +46,8 @@ public class Data {
         messages = new YmlFile("messages");
         players = new YmlFile("players");
         vanishedPlayers = new ConcurrentHashMap<>();
+        advancementAnnouncementRules = new ConcurrentHashMap<>();
+        advancementMessageApiAvailable = detectAdvancementMessageApi();
 
         // Load configuration and validate
         validateConfiguration();
@@ -52,7 +60,9 @@ public class Data {
         }
 
         BarColor barColor = getBarColor(config.get().getString("plugin-color"));
-        vanishedBossBar = Bukkit.createBossBar("Vanish", barColor, BarStyle.SOLID);
+        BarStyle barStyle = getBarStyle(config.get().getString("bossbar.style"));
+        String barTitle = ColorUtil.colorize(config.get().getString("bossbar.title", "Vanish"));
+        vanishedBossBar = Bukkit.createBossBar(barTitle, barColor, barStyle);
 
         ProtocolLib protocolLib = null;
         if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
@@ -65,6 +75,12 @@ public class Data {
             }
         }
         this.protocolLib = protocolLib;
+
+        if (useAdvancementGameruleFallback()) {
+            Logger.debug("Advancement suppression: using global gamerule fallback (no Paper message API or ProtocolLib detected).");
+        } else {
+            Logger.debug("Advancement suppression: using per-player mode.");
+        }
     }
 
     /**
@@ -89,6 +105,18 @@ public class Data {
         }
         if (!cfg.contains("plugin-color")) {
             cfg.set("plugin-color", "BLUE");
+            modified = true;
+        }
+        if (!cfg.contains("bossbar.enabled")) {
+            cfg.set("bossbar.enabled", true);
+            modified = true;
+        }
+        if (!cfg.contains("bossbar.title")) {
+            cfg.set("bossbar.title", "&bYou are currently vanished");
+            modified = true;
+        }
+        if (!cfg.contains("bossbar.style")) {
+            cfg.set("bossbar.style", "SOLID");
             modified = true;
         }
         if (!cfg.contains("disabled-actions.damage")) {
@@ -117,6 +145,10 @@ public class Data {
         }
         if (!cfg.contains("disabled-actions.death-messages")) {
             cfg.set("disabled-actions.death-messages", true);
+            modified = true;
+        }
+        if (!cfg.contains("disabled-actions.advancements")) {
+            cfg.set("disabled-actions.advancements", true);
             modified = true;
         }
         if (!cfg.contains("disabled-actions.player-push")) {
@@ -162,14 +194,75 @@ public class Data {
         boolean debugMode = config.get().getBoolean("debug-mode", false);
         Logger.setDebugEnabled(debugMode);
 
-        updateBarColor();
+        updateBossBar();
 
         // Refresh cached disabled-action settings (BUG-1 fix)
         if (disabledActions != null) {
             disabledActions.reloadConfig();
         }
+        updateAdvancementAnnouncements();
 
         Logger.info("Configurations reloaded successfully!");
+    }
+
+    /**
+     * Applies the advancement-announcement suppression strategy.
+     * <p>
+     * When a per-player mechanism is available (Paper's advancement message API or ProtocolLib)
+     * this is a no-op, since suppression then happens per vanished player. Only on a plain Spigot
+     * server without ProtocolLib do we fall back to toggling the world {@code announceAdvancements}
+     * gamerule, which reliably suppresses vanilla and datapack advancements for everyone while at
+     * least one player is vanished.
+     */
+    public void updateAdvancementAnnouncements() {
+        if (!useAdvancementGameruleFallback()) {
+            return;
+        }
+
+        if (!config.get().getBoolean("disabled-actions.advancements", true) || vanishedPlayers.isEmpty()) {
+            restoreAdvancementAnnouncements();
+            return;
+        }
+
+        for (World world : Bukkit.getWorlds()) {
+            advancementAnnouncementRules.putIfAbsent(world.getUID(),
+                    Boolean.TRUE.equals(world.getGameRuleValue(GameRule.ANNOUNCE_ADVANCEMENTS)));
+            if (Boolean.TRUE.equals(world.getGameRuleValue(GameRule.ANNOUNCE_ADVANCEMENTS))) {
+                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+            }
+        }
+    }
+
+    /**
+     * Restores any world advancement-announcement gamerules changed by
+     * {@link #updateAdvancementAnnouncements()}.
+     */
+    public void restoreAdvancementAnnouncements() {
+        for (Map.Entry<UUID, Boolean> entry : advancementAnnouncementRules.entrySet()) {
+            World world = Bukkit.getWorld(entry.getKey());
+            if (world != null) {
+                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, entry.getValue());
+            }
+        }
+        advancementAnnouncementRules.clear();
+    }
+
+    /**
+     * @return {@code true} when neither Paper's advancement message API nor ProtocolLib is
+     * available, so the global gamerule is the only reliable way to suppress advancement
+     * announcements for vanished players.
+     */
+    public boolean useAdvancementGameruleFallback() {
+        return !advancementMessageApiAvailable && protocolLib == null;
+    }
+
+    private static boolean detectAdvancementMessageApi() {
+        for (Method method : PlayerAdvancementDoneEvent.class.getMethods()) {
+            if (method.getName().equals("message") && method.getParameterCount() == 1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -177,6 +270,33 @@ public class Data {
      */
     public void updateBarColor() {
         vanishedBossBar.setColor(getBarColor(config.get().getString("plugin-color")));
+    }
+
+    /**
+     * Applies the configured title, color, style and enabled state to the vanish boss bar.
+     */
+    public void updateBossBar() {
+        FileConfiguration cfg = config.get();
+        vanishedBossBar.setColor(getBarColor(cfg.getString("plugin-color")));
+        vanishedBossBar.setStyle(getBarStyle(cfg.getString("bossbar.style")));
+        vanishedBossBar.setTitle(ColorUtil.colorize(cfg.getString("bossbar.title", "Vanish")));
+
+        if (isBossBarEnabled()) {
+            for (VanishPlayer vanishPlayer : vanishedPlayers.values()) {
+                vanishedBossBar.addPlayer(vanishPlayer.getPlayer());
+            }
+        } else {
+            vanishedBossBar.removeAll();
+        }
+    }
+
+    /**
+     * Returns whether the vanish boss bar is enabled.
+     *
+     * @return {@code true} if the boss bar should be shown to vanished players
+     */
+    public boolean isBossBarEnabled() {
+        return config.get().getBoolean("bossbar.enabled", true);
     }
 
     /**
@@ -235,9 +355,29 @@ public class Data {
     }
 
     /**
+     * Retrieves a BarStyle based on the provided key.
+     *
+     * @param key the key to look up the BarStyle
+     * @return the corresponding BarStyle, or SOLID if the key is invalid or not provided
+     */
+    private BarStyle getBarStyle(String key) {
+        BarStyle barStyle = BarStyle.SOLID;
+        if (key != null && !key.isEmpty()) {
+            try {
+                barStyle = BarStyle.valueOf(key.toUpperCase());
+            } catch (IllegalArgumentException exception) {
+                Logger.warning("Invalid bar style '" + key + "', using SOLID as default.");
+                Logger.debug(exception.getMessage());
+            }
+        }
+        return barStyle;
+    }
+
+    /**
      * Cleans up resources when the plugin is disabled.
      */
     public void cleanup() {
+        restoreAdvancementAnnouncements();
         if (protocolLib != null) {
             protocolLib.cleanup();
         }

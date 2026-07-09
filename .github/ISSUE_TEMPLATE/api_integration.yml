@@ -1,0 +1,79 @@
+name: API / Integration
+description: Report a bug or request a feature for the public VanishAPI (for plugin developers)
+title: "[API]: "
+labels: ["api"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template if you are **developing a plugin** that integrates with the
+        public `VanishAPI`. For general usage questions, please use
+        [Discussions](https://github.com/fronsky-development/vanish/discussions) instead.
+        See the [API documentation](https://github.com/fronsky-development/vanish/blob/main/API.md).
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+        - label: I have read the API documentation (API.md).
+          required: true
+        - label: I am using the latest version of Vanish (`/vanish info`).
+          required: true
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type
+      options:
+        - API bug (a public method or event behaves incorrectly)
+        - Missing API (I need a method/event that doesn't exist)
+        - API documentation issue
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: vanish-version
+    attributes:
+      label: Vanish version
+      description: Output of `/vanish info`.
+      placeholder: "3.1.1"
+    validations:
+      required: true
+  - type: input
+    id: consumer
+    attributes:
+      label: Your plugin & version
+      description: The plugin that integrates with the VanishAPI.
+      placeholder: "MyPlugin 1.2.0"
+    validations:
+      required: false
+  - type: input
+    id: api-members
+    attributes:
+      label: Relevant API method(s) / event(s)
+      placeholder: "VanishAPI.isVanished(player), VisibilityChangeEvent"
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the bug, the missing method, or the documentation issue in detail.
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Code sample
+      description: Minimal code showing how you call the API. This helps a lot.
+      render: java
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs. actual behavior
+      description: For API bugs, what did you expect and what happened instead?
+    validations:
+      required: false
