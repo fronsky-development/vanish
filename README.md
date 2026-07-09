@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-red?style=for-the-badge" alt="All Rights Reserved">
 </p>
 
-<h1 align="center">Vanish</h1>
+<h1 align="center">Fronsky Vanish</h1>
 
 <p align="center">
   A modern, feature-rich vanish plugin for Minecraft servers.<br>

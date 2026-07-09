@@ -17,7 +17,7 @@ sure you are running the most recent release before reporting an issue.
 If you discover a security vulnerability, report it privately using one of the
 following channels:
 
-- **Email:** contact@fronsky.nl
+- **Email:** support@fronsky.nl
 - **GitHub:** open a private [security advisory](https://github.com/fronsky-development/vanish/security/advisories/new)
 
 Please include as much of the following as possible:
