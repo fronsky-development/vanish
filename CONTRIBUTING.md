@@ -27,7 +27,7 @@ pull requests is welcome.
 
 This project and everyone participating in it is governed by our
 [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold
-this code. Please report unacceptable behavior to **contact@fronsky.nl**.
+this code. Please report unacceptable behavior to **support@fronsky.nl**.
 
 ## Ways to Contribute
 
