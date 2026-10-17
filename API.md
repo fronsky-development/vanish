@@ -74,7 +74,7 @@ All methods are `public static`.
 | `vanishPlayer(Player)` | `boolean` | Vanish a player (`false` if already vanished) |
 | `unvanishPlayer(Player)` | `boolean` | Unvanish a player (`false` if not vanished) |
 | `toggleVanish(Player)` | `boolean` | Toggle vanish; returns `true` if now vanished |
-| `getVanishedPlayers()` | `Collection<VanishPlayer>` | All currently vanished players |
+| `getVanishedPlayers()` | `Collection<VanishPlayer>` | Snapshot of all currently vanished players |
 | `getVanishedPlayerUUIDs()` | `Collection<UUID>` | UUIDs of all vanished players |
 | `getVanishedPlayerCount()` | `int` | Number of vanished players |
 | `canSeeVanished(Player)` | `boolean` | Whether the player has `vanish.see` permission |

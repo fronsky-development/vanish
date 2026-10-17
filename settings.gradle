@@ -1,2 +1,11 @@
+/**
+ * Copyright (c) by Fronsky.
+ */
+
+plugins {
+    // Downloads a matching JDK when the Java 17 toolchain is not installed locally.
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 rootProject.name = 'Vanish'
 

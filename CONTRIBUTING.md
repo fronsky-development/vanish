@@ -70,7 +70,8 @@ and describe:
 
 **Requirements**
 
-- **Java 17** or newer (JDK).
+- **Java 17** or newer (JDK) to run Gradle. If JDK 17 itself is missing, Gradle
+  downloads it automatically for compiling.
 - **Git**.
 - No Gradle install needed — the project ships with the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
 
@@ -113,16 +114,24 @@ Maintainers periodically promote `dev` into `main` for releases.
 
 ```
 src/main/java/nl/fronsky/vanish/
-  Main.java              # Plugin entry point
+  VanishPlugin.java      # Plugin entry point; wires all components together
   api/                   # Public API (VanishAPI) — treat as stable, avoid breaking changes
-  integrations/          # PlaceholderAPI and other integrations
-  logic/                 # Framework: commands, files, logging, modules, tasks, utils
-  module/                # Vanish feature module: commands, events, models, subcommands
-src/main/resources/      # config.yml, messages.yml, players.yml, plugin.yml
+  integrations/          # Optional hooks: ProtocolLib, PlaceholderAPI, Dynmap
+  logic/utils/           # Small generic helpers (chat pagination, colors)
+  module/                # Vanish behavior: VanishManager (vanish state), boss bar, permissions
+    commands/            # /vanish command and its subcommands
+    config/              # Typed access to config.yml and messages.yml
+    enums/               # Vanish state enum (State)
+    events/              # Bukkit listeners and the custom VisibilityChangeEvent
+    gui/                 # Inventory menus
+    models/              # VanishPlayer and PlayerState
+    storage/             # Asynchronous players.yml storage
+src/main/resources/      # config.yml, messages.yml, plugin.yml (players.yml is created at runtime)
+src/test/java/           # JUnit tests
 ```
 
-The `logic/` package is a reusable framework; the `module/` package contains the
-actual vanish behavior. Keep new vanish features inside `module/`.
+`VanishManager` is the single source of truth for who is vanished; change vanish
+state only on the main server thread. Keep new vanish features inside `module/`.
 
 ## Coding Guidelines
 
@@ -131,6 +140,9 @@ actual vanish behavior. Keep new vanish features inside `module/`.
   please enable EditorConfig support in your IDE.
 - Avoid direct **NMS / CraftBukkit** internals. Use the Bukkit API or ProtocolLib so
   the plugin stays compatible across Minecraft versions.
+- The build compiles against Spigot API **1.20**, the oldest supported version.
+  Raising it drops support for older servers (and for Java 17, since Minecraft
+  1.20.5+ requires Java 21), so discuss that in an issue first.
 - Treat integrations (ProtocolLib, PlaceholderAPI, Dynmap) as **optional** — guard
   their usage so the plugin still works when they are absent.
 - Do **not** hard-code user-facing text. Add new strings to `messages.yml` and load

@@ -1,5 +1,5 @@
-# Auto-detect text files and normalize line endings
-* text=auto
+# Auto-detect text files and use LF everywhere, matching .editorconfig
+* text=auto eol=lf
 
 # Java sources
 *.java text diff=java
