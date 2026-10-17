@@ -176,7 +176,7 @@ public final class VanishManager {
             return;
         }
 
-        removeEffects(player);
+        removeEffects(player, quitting);
         bossBar.hide(player);
         if (dynmap != null) {
             dynmap.show(player);
@@ -238,7 +238,7 @@ public final class VanishManager {
      */
     public void shutdown() {
         for (Player player : getOnlineVanishedPlayers()) {
-            removeEffects(player);
+            removeEffects(player, false);
             revealToOthers(player);
             if (dynmap != null) {
                 dynmap.show(player);
@@ -280,8 +280,13 @@ public final class VanishManager {
         appliedEffects.put(player.getUniqueId(), new AppliedEffects(nightVision, flight, couldFly));
     }
 
-    private void removeEffects(Player player) {
-        player.removeMetadata(VANISHED_METADATA_KEY, plugin);
+    private void removeEffects(Player player, boolean quitting) {
+        if (quitting) {
+            // Plugins that handle the quit after Vanish (e.g. chat bridges) still check this flag.
+            Bukkit.getScheduler().runTask(plugin, () -> player.removeMetadata(VANISHED_METADATA_KEY, plugin));
+        } else {
+            player.removeMetadata(VANISHED_METADATA_KEY, plugin);
+        }
         player.setCollidable(true);
         player.setCanPickupItems(true);
 

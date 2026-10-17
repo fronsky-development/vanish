@@ -40,6 +40,9 @@ vanish_silent_disabled: '&aYou have disabled the silent mode when joining the ga
 # Message sent when the Vanish plugin is reloaded successfully.
 plugin_reloaded: '&aThe Fronsky Vanish plugin has been reloaded successfully!'
 
+# Confirmation message sent when the plugin color is changed with /vanish color.
+plugin_color_changed: '&aThe plugin color has been changed to {color}.'
+
 # Permission overview lines used by /vanish permissions
 # You can fully customize this list.
 permissions_header: '&8<--------------- {color}&lVanish Permissions&8 --------------->'

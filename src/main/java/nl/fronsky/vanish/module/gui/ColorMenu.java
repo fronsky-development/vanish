@@ -14,7 +14,7 @@ import org.bukkit.event.inventory.ClickType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * Lets an admin pick the plugin accent color from the available boss bar colors.
@@ -26,10 +26,13 @@ public final class ColorMenu extends Menu {
             "",
             ChatColor.YELLOW + "Click to apply");
 
-    private final Consumer<BarColor> colorAction;
+    private final BiConsumer<Player, BarColor> colorAction;
     private final List<BarColor> colors = new ArrayList<>();
 
-    public ColorMenu(ChatColor accent, Consumer<BarColor> colorAction) {
+    /**
+     * @param colorAction applies the color picked by the player
+     */
+    public ColorMenu(ChatColor accent, BiConsumer<Player, BarColor> colorAction) {
         super(9, accent + "Color Selection");
         this.colorAction = colorAction;
 
@@ -45,7 +48,7 @@ public final class ColorMenu extends Menu {
     @Override
     protected void onClick(Player viewer, int slot, ClickType click) {
         if (slot < colors.size()) {
-            colorAction.accept(colors.get(slot));
+            colorAction.accept(viewer, colors.get(slot));
             viewer.closeInventory();
         }
     }

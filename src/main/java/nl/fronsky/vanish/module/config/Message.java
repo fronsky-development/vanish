@@ -33,6 +33,7 @@ public enum Message {
     WRONG_ARGS("&cPlease provide the required argument '{arg}' before executing this command."),
     NO_PLAYER("You must be a player to use this command."),
     NO_VALID_COLOR("&cThe given color '{color}' is not a valid color."),
+    PLUGIN_COLOR_CHANGED("&aThe plugin color has been changed to {color}."),
     PLUGIN_RELOADED("&aThe Fronsky (r) Vanish plugin has been reloaded successfully!"),
     NOTIFICATION_VANISHED_ACTIONBAR("&3You are now vanished"),
     NOTIFICATION_VISIBLE_ACTIONBAR("&3You are now visible"),

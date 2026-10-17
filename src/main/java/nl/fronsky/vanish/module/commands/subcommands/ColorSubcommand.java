@@ -51,11 +51,14 @@ public final class ColorSubcommand implements Subcommand {
             return;
         }
 
+        BarColor color;
         try {
-            applyColor(BarColor.valueOf(args[0].toUpperCase(Locale.ROOT)));
+            color = BarColor.valueOf(args[0].toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             messages.send(sender, Message.NO_VALID_COLOR, "{color}", args[0]);
+            return;
         }
+        applyColor(sender, color);
     }
 
     @Override
@@ -66,8 +69,9 @@ public final class ColorSubcommand implements Subcommand {
         return Arrays.stream(BarColor.values()).map(color -> color.name().toLowerCase(Locale.ROOT)).toList();
     }
 
-    private void applyColor(BarColor color) {
+    private void applyColor(CommandSender sender, BarColor color) {
         config.setPluginColor(color);
         vanishManager.refreshBossBar();
+        messages.send(sender, Message.PLUGIN_COLOR_CHANGED, "{color}", color.name());
     }
 }
