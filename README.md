@@ -149,9 +149,13 @@ if (VanishAPI.isAvailable()) {
 
 > The API is covered by a dedicated exception in the [LICENSE](LICENSE). Third-party plugins may freely call the public API at runtime.
 
+## Metrics
+
+Vanish uses [bStats](https://bstats.org/plugin/bukkit/Fronsky%20Vanish) to collect anonymous usage statistics, such as the number of servers and players, Minecraft and Java versions, and the plugin version. No personal data is collected. Server owners can opt out for all plugins at once by setting `enabled: false` in `plugins/bStats/config.yml`.
+
 ## Building from Source
 
-Requires Git. No Gradle installation needed - the project includes the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+Requires Git and a JDK 17 or newer to run Gradle. No Gradle installation needed - the project includes the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html). If JDK 17 itself is not installed, Gradle downloads it automatically for compiling.
 
 ```bash
 git clone https://github.com/fronsky-development/vanish.git
@@ -163,7 +167,7 @@ The output jar will be at `build/libs/Vanish-<version>.jar`.
 
 ## Compatibility
 
-Compiled against Spigot API 1.20. Compatible with 1.21+ by avoiding NMS/CraftBukkit internals and relying on ProtocolLib for version-sensitive packet behavior.
+Compiled against Spigot API 1.20, the oldest supported version, and avoids NMS/CraftBukkit internals, so one jar runs on 1.20 and newer. Version-sensitive packet behavior relies on ProtocolLib.
 
 ## Issues
 

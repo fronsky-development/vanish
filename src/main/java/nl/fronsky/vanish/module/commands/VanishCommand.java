@@ -4,203 +4,129 @@
 
 package nl.fronsky.vanish.module.commands;
 
-import nl.fronsky.vanish.logic.commands.CommandHandler;
-import nl.fronsky.vanish.logic.commands.annotations.CommandClass;
-import nl.fronsky.vanish.logic.commands.annotations.SubCommandMethod;
-import nl.fronsky.vanish.logic.logging.Logger;
-import nl.fronsky.vanish.logic.utils.Language;
-import nl.fronsky.vanish.logic.utils.Result;
-import nl.fronsky.vanish.module.VanishModule;
-import nl.fronsky.vanish.module.enums.State;
+import nl.fronsky.vanish.module.VanishManager;
+import nl.fronsky.vanish.module.VanishPermissions;
+import nl.fronsky.vanish.module.config.Message;
+import nl.fronsky.vanish.module.config.Messages;
+import nl.fronsky.vanish.module.config.VanishConfig;
 import nl.fronsky.vanish.module.models.VanishPlayer;
-import nl.fronsky.vanish.module.subcommands.vanish.*;
-import nl.fronsky.vanish.module.utils.Data;
-import nl.fronsky.vanish.module.utils.MetaData;
 import org.bukkit.Bukkit;
-import org.bukkit.boss.BarColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-@CommandClass(name = "vanish", permission = "vanish.cmd.vanish")
-public class VanishCommand extends CommandHandler {
-    private final Data data;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-    public VanishCommand() {
-        data = VanishModule.getData();
+/**
+ * {@code /vanish} toggles the sender, {@code /vanish <player>} toggles another player and
+ * {@code /vanish <subcommand>} runs one of the registered {@link Subcommand}s.
+ */
+public final class VanishCommand implements TabExecutor {
+    private static final String SUBCOMMAND_PERMISSION_PREFIX = VanishPermissions.COMMAND + ".";
+
+    private final VanishConfig config;
+    private final Messages messages;
+    private final VanishManager vanishManager;
+    private final Map<String, Subcommand> subcommands = new LinkedHashMap<>();
+
+    public VanishCommand(VanishConfig config, Messages messages, VanishManager vanishManager) {
+        this.config = config;
+        this.messages = messages;
+        this.vanishManager = vanishManager;
+    }
+
+    public void register(Subcommand subcommand) {
+        subcommands.put(subcommand.getName(), subcommand);
     }
 
     @Override
-    public void onCommand(CommandSender sender, String label, String[] args) {
-        VanishPlayer vanishPlayer = null;
-        if (sender instanceof Player) {
-            vanishPlayer = new VanishPlayer((Player) sender);
-        }
-        if (args.length > 0) {
-            Result<VanishPlayer> result = VanishPlayer.getPlayer(args[0]);
-            if (result.success()) {
-                VanishPlayer target = result.value();
-                if (vanishPlayer != null && !vanishPlayer.hasPermission("vanish.cmd.vanish.others")) {
-                    vanishPlayer.sendMessage(Language.NO_PERMISSION.getMessageWithColor());
-                    return;
-                }
-                others(sender, target);
-                return;
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 0) {
+            if (sender instanceof Player player) {
+                toggleSelf(player);
+            } else {
+                messages.send(sender, Message.NO_PLAYER);
             }
+            return true;
         }
-        if (vanishPlayer == null) {
-            Logger.info(Language.NO_PLAYER.getPlainMessage());
-            return;
+
+        Subcommand subcommand = subcommands.get(args[0].toLowerCase(Locale.ROOT));
+        if (subcommand != null) {
+            if (sender.hasPermission(permissionOf(subcommand))) {
+                subcommand.execute(sender, Arrays.copyOfRange(args, 1, args.length));
+            } else {
+                messages.send(sender, Message.NO_PERMISSION);
+            }
+            return true;
         }
-        if (MetaData.getVanishState(vanishPlayer.getPlayer(), data).equals(State.HIDDEN)) {
-            vanishPlayer.show(false);
+
+        Player target = Bukkit.getPlayer(args[0]);
+        if (target == null) {
+            messages.send(sender, Message.PLAYER_NOT_ONLINE);
         } else {
-            vanishPlayer.hide(false);
-            if (data.isSoundEnabled()) {
-                vanishPlayer.getPlayer().playSound(vanishPlayer.getPlayer().getLocation(), data.getSound(), 1.0f, 1.0f);
-            }
+            toggleOther(sender, target);
         }
+        return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> names = subcommands.values().stream()
+                    .filter(subcommand -> sender.hasPermission(permissionOf(subcommand)))
+                    .map(Subcommand::getName)
+                    .toList();
+            return StringUtil.copyPartialMatches(args[0], names, new ArrayList<>());
+        }
+
+        Subcommand subcommand = subcommands.get(args[0].toLowerCase(Locale.ROOT));
+        if (subcommand == null || !sender.hasPermission(permissionOf(subcommand))) {
+            return List.of();
+        }
+        List<String> candidates = subcommand.tabComplete(sender, Arrays.copyOfRange(args, 1, args.length));
+        return StringUtil.copyPartialMatches(args[args.length - 1], candidates, new ArrayList<>());
     }
 
     /**
-     * Toggles the vanish state of a specified player and sends a message to the command sender.
-     *
-     * @param sender the command sender who triggered the vanish toggle
-     * @param target the {@link VanishPlayer} whose vanish state is being toggled
+     * Toggles the vanish state of a player on behalf of the sender, who needs the "others" permission.
      */
-    private void others(CommandSender sender, VanishPlayer target) {
-        boolean isVanished = MetaData.getVanishState(target.getPlayer(), data).equals(State.HIDDEN);
-        Language messageKey = isVanished ? Language.VISIBLE_SUCCESS : Language.VANISH_SUCCESS;
-
-        if (sender instanceof Player) {
-            String message = messageKey.getMessageWithColor().replace("{player}", target.getPlayer().getDisplayName());
-            sender.sendMessage(message);
-        } else {
-            String message = messageKey.getPlainMessage().replace("{player}", target.getName());
-            Logger.info(message);
+    public void toggleOther(CommandSender sender, Player target) {
+        if (!sender.hasPermission(VanishPermissions.COMMAND_OTHERS)) {
+            messages.send(sender, Message.NO_PERMISSION);
+            return;
         }
+        VanishPlayer vanishPlayer = vanishManager.getPlayer(target);
+        boolean vanish = !vanishPlayer.isVanished();
+        Message confirmation = vanish ? Message.VANISH_SUCCESS : Message.VISIBLE_SUCCESS;
+        messages.send(sender, confirmation, "{player}", target.getDisplayName());
+        setVanished(vanishPlayer, vanish);
+    }
 
-        if (isVanished) {
-            target.show(false);
-        } else {
-            target.hide(false);
-            if (data.isSoundEnabled()) {
-                target.getPlayer().playSound(target.getPlayer().getLocation(), data.getSound(), 1.0f, 1.0f);
-            }
+    private void toggleSelf(Player player) {
+        VanishPlayer vanishPlayer = vanishManager.getPlayer(player);
+        setVanished(vanishPlayer, !vanishPlayer.isVanished());
+    }
+
+    private void setVanished(VanishPlayer vanishPlayer, boolean vanish) {
+        if (!vanish) {
+            vanishManager.unvanish(vanishPlayer, false);
+            return;
+        }
+        vanishManager.vanish(vanishPlayer, false);
+        if (config.isSoundEnabled()) {
+            Player player = vanishPlayer.getPlayer();
+            player.playSound(player.getLocation(), config.getSound(), 1.0f, 1.0f);
         }
     }
 
-    @SubCommandMethod
-    public void gui(CommandSender sender, String label, String[] args) {
-        Gui.execute(sender, data.getPluginChatColor(), data);
-    }
-
-    @SubCommandMethod
-    public void sound(CommandSender sender, String label, String[] args) {
-        Sound.execute(args, sender, data, data.getPluginChatColor());
-    }
-
-    @SubCommandMethod
-    public void silent(CommandSender sender, String label, String[] args) {
-        Silent.execute(args, sender, data);
-    }
-
-    @SubCommandMethod
-    public void list(CommandSender sender, String label, String[] args) {
-        List.execute(sender, data);
-    }
-
-    @SubCommandMethod
-    public void join(CommandSender sender, String label, String[] args) {
-        Join.execute(sender);
-    }
-
-    @SubCommandMethod
-    public void quit(CommandSender sender, String label, String[] args) {
-        Quit.execute(sender);
-    }
-
-    @SubCommandMethod
-    public void tp(CommandSender sender, String label, String[] args) {
-        Tp.execute(sender, args);
-    }
-
-    @SubCommandMethod
-    public void color(CommandSender sender, String label, String[] args) {
-        Color.execute(sender, args, data.getPluginChatColor(), data);
-    }
-
-    @SubCommandMethod
-    public void info(CommandSender sender, String label, String[] args) {
-        Info.execute(sender, data.getPluginChatColor());
-    }
-
-    @SubCommandMethod
-    public void help(CommandSender sender, String label, String[] args) {
-        int page = 1;
-        if (args.length > 0) {
-            try {
-                page = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        Help.execute(sender, data.getPluginChatColor(), page);
-    }
-
-    @SubCommandMethod
-    public void reload(CommandSender sender, String label, String[] args) {
-        Reload.execute(data, sender);
-    }
-
-    @SubCommandMethod
-    public void permissions(CommandSender sender, String label, String[] args) {
-        int page = 1;
-        if (args.length > 0) {
-            try {
-                page = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        Permissions.execute(sender, data.getPluginChatColor(), data, page);
-    }
-
-    @SubCommandMethod
-    public void placeholders(CommandSender sender, String label, String[] args) {
-        int page = 1;
-        if (args.length > 0) {
-            try {
-                page = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        Placeholders.execute(sender, data.getPluginChatColor(), data, page);
-    }
-
-    @Override
-    protected java.util.List<String> getArgumentCompletions(CommandSender sender, String subcommand, String[] args) {
-        if (args.length != 2) {
-            return new java.util.ArrayList<>();
-        }
-
-        switch (subcommand.toLowerCase()) {
-            case "tp": {
-                java.util.List<String> players = new java.util.ArrayList<>();
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    players.add(online.getName());
-                }
-                return players;
-            }
-            case "sound":
-            case "silent":
-                return java.util.Arrays.asList("on", "off");
-            case "color": {
-                java.util.List<String> colors = new java.util.ArrayList<>();
-                for (BarColor barColor : BarColor.values()) {
-                    colors.add(barColor.name().toLowerCase());
-                }
-                return colors;
-            }
-            default:
-                return new java.util.ArrayList<>();
-        }
+    private static String permissionOf(Subcommand subcommand) {
+        return SUBCOMMAND_PERMISSION_PREFIX + subcommand.getName();
     }
 }

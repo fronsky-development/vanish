@@ -12,7 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,24 +23,20 @@ public final class ChatPaginator {
     private ChatPaginator() {
     }
 
-    private static String separatorLike(String header) {
-        if (header == null || header.isEmpty()) {
-            return ChatColor.DARK_GRAY + "<------------------------------->";
+    /**
+     * Reads the page number from the first argument.
+     *
+     * @return the requested page, or {@code 1} if none or an invalid one was given
+     */
+    public static int parsePage(String[] args) {
+        if (args.length == 0) {
+            return 1;
         }
-        // Strip color codes, keep the visible width.
-        String plain = ChatColor.stripColor(header);
-        int len = plain.length();
-        if (len <= 0) {
-            return ChatColor.DARK_GRAY + "<------------------------------->";
+        try {
+            return Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            return 1;
         }
-        // Fill with dashes but keep the same start/end characters as the header.
-        char first = plain.charAt(0);
-        char last = plain.charAt(len - 1);
-        if (len == 1) {
-            return ChatColor.DARK_GRAY + String.valueOf(first);
-        }
-        String middle = "-".repeat(Math.max(0, len - 2));
-        return ChatColor.DARK_GRAY + String.valueOf(first) + middle + last;
     }
 
     private static String separatorLikeVisible(String visibleHeader) {
@@ -87,8 +82,11 @@ public final class ChatPaginator {
         boolean showPageIndicator = totalPages > 1;
 
         // Premium-ish style: centered-ish title with a longer dash line.
-        String pagePart = showPageIndicator ? (ChatColor.DARK_GRAY + " " + ChatColor.GRAY + "(" + safePage + "/" + totalPages + ")") : "";
-        String header = ChatColor.DARK_GRAY + "<--------- " + accent + ChatColor.BOLD + title + ChatColor.RESET + pagePart + ChatColor.DARK_GRAY + " --------->";
+        String pagePart = showPageIndicator
+                ? ChatColor.DARK_GRAY + " " + ChatColor.GRAY + "(" + safePage + "/" + totalPages + ")"
+                : "";
+        String header = ChatColor.DARK_GRAY + "<--------- " + accent + ChatColor.BOLD + title + ChatColor.RESET
+                + pagePart + ChatColor.DARK_GRAY + " --------->";
         sender.sendMessage(header);
 
         String sep = separatorLikeVisible(visibleHeader(header));
@@ -154,12 +152,5 @@ public final class ChatPaginator {
 
         player.spigot().sendMessage(footer);
         player.sendMessage(separator);
-    }
-
-    public static List<String> toLines(String... lines) {
-        List<String> list = new ArrayList<>();
-        if (lines == null) return list;
-        Collections.addAll(list, lines);
-        return list;
     }
 }

@@ -4,62 +4,54 @@
 
 package nl.fronsky.vanish.module.events.custom;
 
-import lombok.Getter;
-import lombok.NonNull;
-import nl.fronsky.vanish.module.VanishModule;
-import nl.fronsky.vanish.module.enums.State;
 import nl.fronsky.vanish.module.models.VanishPlayer;
-import nl.fronsky.vanish.module.utils.Data;
-import nl.fronsky.vanish.module.utils.ProtocolLib;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@Getter
+/**
+ * Called after a player has vanished or has become visible again.
+ */
 public class VisibilityChangeEvent extends Event {
-    private static final HandlerList handlers;
-
-    static {
-        handlers = new HandlerList();
-    }
+    private static final HandlerList HANDLERS = new HandlerList();
 
     private final VanishPlayer vanishPlayer;
-    private final boolean visible, action;
-    private final Data data;
-    private final ProtocolLib protocolLib;
+    private final boolean visible;
+    private final boolean action;
 
+    /**
+     * @param vanishPlayer the player whose visibility changed
+     * @param action       {@code true} if the change was caused by the player joining or quitting
+     */
     public VisibilityChangeEvent(VanishPlayer vanishPlayer, boolean action) {
         this.vanishPlayer = vanishPlayer;
+        this.visible = !vanishPlayer.isVanished();
         this.action = action;
-        visible = vanishPlayer.getState().equals(State.VISIBLE);
-        data = VanishModule.getData();
-        protocolLib = data.getProtocolLib();
     }
 
-    /**
-     * Retrieves the handler list for PlayerVisibilityChangeEvent.
-     *
-     * @return the handler list for PlayerVisibilityChangeEvent
-     */
     public static HandlerList getHandlerList() {
-        return VisibilityChangeEvent.handlers;
+        return HANDLERS;
+    }
+
+    public VanishPlayer getVanishPlayer() {
+        return vanishPlayer;
     }
 
     /**
-     * Checks if ProtocolLib plugin is active.
-     *
-     * @return {@code true} if ProtocolLib is active, otherwise {@code false}
+     * @return {@code true} if the player became visible, {@code false} if the player vanished
      */
-    public boolean isProtocolLibActive() {
-        return this.protocolLib != null;
+    public boolean isVisible() {
+        return visible;
     }
 
     /**
-     * Retrieves the list of event handlers for PlayerVisibilityChangeEvent.
-     *
-     * @return the list of event handlers for PlayerVisibilityChangeEvent
+     * @return {@code true} if the change was caused by the player joining (vanish) or quitting (unvanish)
      */
-    @NonNull
+    public boolean isAction() {
+        return action;
+    }
+
+    @Override
     public HandlerList getHandlers() {
-        return VisibilityChangeEvent.handlers;
+        return HANDLERS;
     }
 }

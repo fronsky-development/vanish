@@ -37,7 +37,7 @@ body:
     attributes:
       label: Vanish version
       description: Output of `/vanish info`.
-      placeholder: "3.1.1"
+      placeholder: "3.1.2"
     validations:
       required: true
   - type: input

@@ -1,11 +1,11 @@
 name: '${plugin_name}'
 version: '${plugin_version}'
 main: '${plugin_main_class}'
-api-version: 1.20
+api-version: '${spigot_version}'
 authors: [ 'Fronsky' ]
 website: 'https://fronsky.nl'
 description: 'This is the official Fronsky Vanish plugin.'
-softdepend: [ 'ProtocolLib', 'Dynmap', 'PlaceholderAPI' ]
+softdepend: [ 'ProtocolLib', 'dynmap', 'PlaceholderAPI' ]
 
 commands:
   vanish:
@@ -18,6 +18,20 @@ permissions:
     default: op
     children:
       vanish.cmd.vanish: true
+      vanish.cmd.vanish.others: true
+      vanish.cmd.vanish.gui: true
+      vanish.cmd.vanish.sound: true
+      vanish.cmd.vanish.silent: true
+      vanish.cmd.vanish.list: true
+      vanish.cmd.vanish.join: true
+      vanish.cmd.vanish.quit: true
+      vanish.cmd.vanish.tp: true
+      vanish.cmd.vanish.color: true
+      vanish.cmd.vanish.info: true
+      vanish.cmd.vanish.help: true
+      vanish.cmd.vanish.reload: true
+      vanish.cmd.vanish.permissions: true
+      vanish.cmd.vanish.placeholders: true
       vanish.see: true
       vanish.join: true
 
