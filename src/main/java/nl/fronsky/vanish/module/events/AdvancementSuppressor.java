@@ -27,13 +27,14 @@ import java.util.UUID;
  * Keeps advancement announcements from revealing vanished players.
  * <p>
  * Uses Paper's per-event message API and/or ProtocolLib when available. On plain Spigot without ProtocolLib the
- * {@code announceAdvancements} gamerule is turned off while anyone is vanished and restored afterwards.
+ * gamerule that announces advancements is turned off while anyone is vanished and restored afterwards.
  */
 public final class AdvancementSuppressor implements Listener {
     private final VanishConfig config;
     private final VanishManager vanishManager;
     private final ProtocolLibHook protocolLib;
     private final Method paperMessageSetter;
+    private final GameRule<Boolean> announceRule;
     private final Map<UUID, Boolean> savedGamerules = new HashMap<>();
 
     /**
@@ -44,6 +45,7 @@ public final class AdvancementSuppressor implements Listener {
         this.vanishManager = vanishManager;
         this.protocolLib = protocolLib;
         this.paperMessageSetter = findPaperMessageSetter();
+        this.announceRule = findAnnounceAdvancementsRule();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -78,7 +80,7 @@ public final class AdvancementSuppressor implements Listener {
      * Applies or reverts the gamerule fallback for the current vanish state and configuration.
      */
     public void update() {
-        if (paperMessageSetter != null || protocolLib != null) {
+        if (paperMessageSetter != null || protocolLib != null || announceRule == null) {
             return;
         }
         if (!config.isAdvancementsDisabled() || vanishManager.getVanishedCount() == 0) {
@@ -86,10 +88,10 @@ public final class AdvancementSuppressor implements Listener {
             return;
         }
         for (World world : Bukkit.getWorlds()) {
-            boolean announces = Boolean.TRUE.equals(world.getGameRuleValue(GameRule.ANNOUNCE_ADVANCEMENTS));
+            boolean announces = Boolean.TRUE.equals(world.getGameRuleValue(announceRule));
             savedGamerules.putIfAbsent(world.getUID(), announces);
             if (announces) {
-                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                world.setGameRule(announceRule, false);
             }
         }
     }
@@ -101,10 +103,26 @@ public final class AdvancementSuppressor implements Listener {
         savedGamerules.forEach((worldId, announce) -> {
             World world = Bukkit.getWorld(worldId);
             if (world != null) {
-                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, announce);
+                world.setGameRule(announceRule, announce);
             }
         });
         savedGamerules.clear();
+    }
+
+    /**
+     * Looks the gamerule up by field name: Minecraft 1.21.11 renamed {@code announceAdvancements} to
+     * {@code show_advancement_messages} and Spigot 26 only has the new constant.
+     */
+    @SuppressWarnings("unchecked")
+    static GameRule<Boolean> findAnnounceAdvancementsRule() {
+        for (String field : new String[]{"ANNOUNCE_ADVANCEMENTS", "SHOW_ADVANCEMENT_MESSAGES"}) {
+            try {
+                return (GameRule<Boolean>) GameRule.class.getField(field).get(null);
+            } catch (ReflectiveOperationException ignored) {
+                // Try the other name.
+            }
+        }
+        return null;
     }
 
     private static Method findPaperMessageSetter() {

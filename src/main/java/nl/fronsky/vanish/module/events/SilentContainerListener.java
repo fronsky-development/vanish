@@ -57,13 +57,13 @@ public final class SilentContainerListener implements Listener {
         this.protocolLib = protocolLib;
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
         Player player = event.getPlayer();
         // The off-hand event follows the cancelled main-hand event and would open the container a second time.
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND || block == null
-                || !vanishManager.isVanished(player)) {
+                || !vanishManager.isVanished(player) || placesBlock(player)) {
             return;
         }
 
@@ -118,7 +118,9 @@ public final class SilentContainerListener implements Listener {
             spectatorSessions.putIfAbsent(player.getUniqueId(), PlayerState.capture(player));
             player.setGameMode(GameMode.SPECTATOR);
         }
-        player.openInventory(inventory);
+        if (player.openInventory(inventory) == null) {
+            endSession(player);
+        }
     }
 
     private void openEnderChest(PlayerInteractEvent event, Player player, Block block) {
@@ -127,10 +129,18 @@ public final class SilentContainerListener implements Listener {
             protocolLib.beginSilentContainer(player, block.getLocation());
         }
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if (player.isOnline()) {
-                player.openInventory(player.getEnderChest());
+            if (!player.isOnline() || player.openInventory(player.getEnderChest()) == null) {
+                endSession(player);
             }
         });
+    }
+
+    /**
+     * @return whether vanilla would place the held block instead of opening the container (sneaking with an item)
+     */
+    private static boolean placesBlock(Player player) {
+        return player.isSneaking() && (player.getInventory().getItemInMainHand().getType() != Material.AIR
+                || player.getInventory().getItemInOffHand().getType() != Material.AIR);
     }
 
     private boolean hasSession(UUID uuid) {

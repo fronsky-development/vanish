@@ -56,7 +56,7 @@ public class VanishPlugin extends JavaPlugin {
     public void onEnable() {
         try {
             enable();
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | LinkageError e) {
             getLogger().log(Level.SEVERE, "Failed to enable Vanish; the plugin will be disabled.", e);
             getServer().getPluginManager().disablePlugin(this);
         }

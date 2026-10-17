@@ -33,6 +33,17 @@ repositories {
         }
         filter { includeGroup 'me.clip' }
     }
+    // Paper API and Mojang libraries used by MockBukkit in tests.
+    exclusiveContent {
+        forRepository {
+            maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+        }
+        filter {
+            includeGroup 'io.papermc.paper'
+            includeGroup 'com.mojang'
+            includeVersionByRegex 'net.md-5', 'bungeecord-chat', '.*-deprecated\\+build\\..*'
+        }
+    }
 }
 
 dependencies {
@@ -46,7 +57,9 @@ dependencies {
     // Shaded and relocated into the plugin jar by shadowJar.
     implementation 'org.bstats:bstats-bukkit:3.2.1'
 
-    testImplementation spigot_api
+    // Mock server on the Paper 1.20 API; newer MockBukkit versions use API that 1.20 plugins only reach
+    // through the server's bytecode rewriting, which MockBukkit does not do.
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.20:3.93.2'
     testImplementation platform('org.junit:junit-bom:6.1.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -55,6 +68,10 @@ dependencies {
         // spigot-api 1.20 pulls in Guava 31.1, which has known vulnerabilities.
         compileOnly 'com.google.guava:guava:32.1.2-jre'
         testImplementation 'com.google.guava:guava:32.1.2-jre'
+        // Test only: MockBukkit and the Paper API pull in versions with known vulnerabilities.
+        testImplementation 'org.apache.commons:commons-lang3:3.18.0'
+        testImplementation 'org.apache.logging.log4j:log4j-api:2.25.5'
+        testImplementation 'org.codehaus.plexus:plexus-utils:3.6.1'
     }
 }
 
@@ -67,6 +84,12 @@ java {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release.set(java_version)
+}
+
+// MockBukkit and the Paper API it runs on require Java 21; the plugin itself stays on Java 17.
+tasks.named('compileTestJava') {
+    javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(21) }
+    options.release.set(21)
 }
 
 wrapper {
@@ -131,4 +154,7 @@ tasks.named('jar') {
 
 test {
     useJUnitPlatform()
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    // Tests run against the unshaded classes, so bStats must skip its relocation check.
+    systemProperty 'bstats.relocatecheck', 'false'
 }

@@ -70,8 +70,8 @@ and describe:
 
 **Requirements**
 
-- **Java 17** or newer (JDK) to run Gradle. If JDK 17 itself is missing, Gradle
-  downloads it automatically for compiling.
+- **Java 17** or newer (JDK) to run Gradle. If JDK 17 (for compiling) or JDK 21
+  (for the tests) is missing, Gradle downloads it automatically.
 - **Git**.
 - No Gradle install needed — the project ships with the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
 
@@ -93,6 +93,10 @@ server's `plugins/` folder to try your changes.
 ```bash
 ./gradlew test
 ```
+
+The tests run Vanish on a mock server ([MockBukkit](https://github.com/MockBukkit/MockBukkit))
+with mock players, so commands, listeners and menus can be tested without a real server.
+MockBukkit needs Java 21; the plugin itself still targets Java 17.
 
 ## Branching Strategy
 
@@ -127,7 +131,7 @@ src/main/java/nl/fronsky/vanish/
     models/              # VanishPlayer and PlayerState
     storage/             # Asynchronous players.yml storage
 src/main/resources/      # config.yml, messages.yml, plugin.yml (players.yml is created at runtime)
-src/test/java/           # JUnit tests
+src/test/java/           # JUnit and MockBukkit tests
 ```
 
 `VanishManager` is the single source of truth for who is vanished; change vanish

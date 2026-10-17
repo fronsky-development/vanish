@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -35,16 +34,14 @@ import java.util.logging.Level;
  * advancement announcements. Packet handlers run on network threads and only use thread-safe state.
  */
 public final class ProtocolLibHook {
-    private static final long SILENT_CONTAINER_TTL_MS = 2500;
     private static final long ADVANCEMENT_ANNOUNCEMENT_TTL_MS = 5000;
-    private static final double OBSERVER_RANGE_SQUARED = 64 * 64;
 
     private final VanishPlugin vanishPlugin;
     private final VanishManager vanishManager;
     private final List<PacketAdapter> adapters = new ArrayList<>();
-    private final Set<UUID> silentContainerPlayers = ConcurrentHashMap.newKeySet();
-    private final Map<UUID, SilentContainer> silentContainers = new ConcurrentHashMap<>();
+    private final SilentContainerSessions silentContainers = new SilentContainerSessions();
     private final Map<UUID, PendingAnnouncement> pendingAnnouncements = new ConcurrentHashMap<>();
+    private volatile boolean soundEffectsReadable = true;
 
     public ProtocolLibHook(VanishPlugin vanishPlugin, VanishManager vanishManager) {
         this.vanishPlugin = vanishPlugin;
@@ -66,27 +63,28 @@ public final class ProtocolLibHook {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
         adapters.forEach(protocolManager::removePacketListener);
         adapters.clear();
-        silentContainerPlayers.clear();
         silentContainers.clear();
         pendingAnnouncements.clear();
     }
 
     /**
-     * Suppresses container animations and sounds for the opener and for players near the container.
+     * Suppresses container animations and sounds for the opener and for players near the container until
+     * {@link #endSilentContainer(UUID)} is called.
      */
     public void beginSilentContainer(Player opener, Location containerLocation) {
-        silentContainerPlayers.add(opener.getUniqueId());
-        silentContainers.put(opener.getUniqueId(),
-                new SilentContainer(containerLocation.clone(), System.currentTimeMillis() + SILENT_CONTAINER_TTL_MS));
+        silentContainers.begin(opener.getUniqueId(), containerLocation.getWorld().getUID(), containerLocation.getX(),
+                containerLocation.getY(), containerLocation.getZ(), System.currentTimeMillis());
     }
 
+    /**
+     * Ends the silent container of the opener; nearby players stay muted briefly for the closing animation.
+     */
     public void endSilentContainer(UUID opener) {
-        silentContainerPlayers.remove(opener);
-        silentContainers.remove(opener);
+        silentContainers.end(opener, System.currentTimeMillis());
     }
 
     public boolean isSilentContainer(UUID player) {
-        return silentContainerPlayers.contains(player);
+        return silentContainers.isOpener(player);
     }
 
     /**
@@ -130,8 +128,8 @@ public final class ProtocolLibHook {
                     }
                     ping.setPlayersOnline(visiblePlayers.size());
                     ping.setBukkitPlayers(visiblePlayers);
-                } catch (RuntimeException e) {
-                    vanishPlugin.debug("Could not update the server list ping: " + e.getMessage());
+                } catch (RuntimeException | LinkageError e) {
+                    vanishPlugin.debug("Could not update the server list ping: " + e);
                 }
             }
         };
@@ -153,8 +151,8 @@ public final class ProtocolLibHook {
                     if (containerPacket) {
                         event.setCancelled(true);
                     }
-                } catch (RuntimeException e) {
-                    vanishPlugin.debug("Silent container packet error: " + e.getMessage());
+                } catch (RuntimeException | LinkageError e) {
+                    vanishPlugin.debug("Silent container packet error: " + e);
                 }
             }
         };
@@ -169,8 +167,8 @@ public final class ProtocolLibHook {
                     if (isAdvancementAnnouncement(event)) {
                         event.setCancelled(true);
                     }
-                } catch (RuntimeException e) {
-                    vanishPlugin.debug("Advancement announcement packet error: " + e.getMessage());
+                } catch (RuntimeException | LinkageError e) {
+                    vanishPlugin.debug("Advancement announcement packet error: " + e);
                 }
             }
         };
@@ -181,24 +179,12 @@ public final class ProtocolLibHook {
      * active silent container to see or hear it
      */
     private boolean shouldSilence(Player receiver) {
-        if (silentContainerPlayers.contains(receiver.getUniqueId()) && vanishManager.isVanished(receiver)) {
+        if (silentContainers.isOpener(receiver.getUniqueId()) && vanishManager.isVanished(receiver)) {
             return true;
         }
-
-        long now = System.currentTimeMillis();
-        silentContainers.values().removeIf(container -> container.expiresAt() < now);
-        if (silentContainers.isEmpty()) {
-            return false;
-        }
         Location location = receiver.getLocation();
-        for (SilentContainer container : silentContainers.values()) {
-            Location containerLocation = container.location();
-            if (containerLocation.getWorld() != null && containerLocation.getWorld().equals(location.getWorld())
-                    && location.distanceSquared(containerLocation) <= OBSERVER_RANGE_SQUARED) {
-                return true;
-            }
-        }
-        return false;
+        return location.getWorld() != null && silentContainers.isNearContainer(location.getWorld().getUID(),
+                location.getX(), location.getY(), location.getZ(), System.currentTimeMillis());
     }
 
     private static boolean isContainerBlockAction(PacketEvent event) {
@@ -210,17 +196,20 @@ public final class ProtocolLibHook {
         return name.contains("chest") || name.contains("shulker") || name.contains("barrel");
     }
 
-    private static boolean isContainerSound(PacketEvent event) {
+    private boolean isContainerSound(PacketEvent event) {
         Object category = readField(event, 1);
         if (category == null || !category.toString().equalsIgnoreCase("BLOCKS")) {
             return false;
         }
 
         Object soundEffect = null;
-        try {
-            soundEffect = event.getPacket().getSoundEffects().read(0);
-        } catch (RuntimeException ignored) {
-            // Older or newer packet layouts; fall back to the raw first field.
+        if (soundEffectsReadable) {
+            try {
+                soundEffect = event.getPacket().getSoundEffects().read(0);
+            } catch (RuntimeException | LinkageError e) {
+                // Unsupported packet layout (e.g. ProtocolLib 5.4.0 on 1.21.11); use the raw field from now on.
+                soundEffectsReadable = false;
+            }
         }
         if (soundEffect == null) {
             soundEffect = readField(event, 0);
@@ -279,7 +268,7 @@ public final class ProtocolLibHook {
                     builder.append(component.getJson()).append(' ');
                 }
             }
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException | LinkageError ignored) {
             // Not every chat packet has chat component fields.
         }
         try {
@@ -303,9 +292,6 @@ public final class ProtocolLibHook {
         } catch (RuntimeException e) {
             return null;
         }
-    }
-
-    private record SilentContainer(Location location, long expiresAt) {
     }
 
     private record PendingAnnouncement(String name, String displayName, long expiresAt) {
